@@ -8,3 +8,8 @@ export * from "./rng";
 export * from "./roadSim";
 export * from "./units";
 export * from "./hash";
+export * from "./geometry";
+export * from "./network";
+export * from "./routing";
+export * from "./networkSim";
+export * from "./presets";

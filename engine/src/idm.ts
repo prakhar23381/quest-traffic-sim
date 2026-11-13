@@ -21,12 +21,18 @@ export interface IdmParams {
   delta: number;
 }
 
-/** Typical urban values (cf. Treiber & Kesting, "Traffic Flow Dynamics"). */
+/**
+ * Urban defaults. Started from typical city values (cf. Treiber & Kesting) and
+ * calibrated so that a stopped queue discharges at ~1,935 veh/h/lane, close to
+ * the HCM base saturation flow (1,900) and IRC guidance (~1,840 per 3.5 m lane).
+ * With a = 1.0 the discharge was 1,809 and the start-up lost time 6.2 s; with
+ * a = 1.5 it is 4.6 s. See docs/VALIDATION.md, "Saturation flow".
+ */
 export const CITY_IDM: Readonly<IdmParams> = Object.freeze({
   v0: 15, // 54 km/h
   T: 1.0,
-  a: 1.0,
-  b: 1.5,
+  a: 1.5,
+  b: 2.0,
   s0: 2.0,
   delta: 4,
 });
@@ -38,9 +44,10 @@ const MIN_GAP = 1e-3;
  * IDM acceleration.
  * @param gap bumper-to-bumper distance to the leader, m (ignored if vLead is null)
  * @param vLead leader speed, m/s, or null for a free road
+ * @param v0 desired speed override (e.g. per-driver or anticipation of a slow curve)
  */
-export function idmAccel(p: IdmParams, v: number, gap: number, vLead: number | null): number {
-  const free = 1 - Math.pow(v / p.v0, p.delta);
+export function idmAccel(p: IdmParams, v: number, gap: number, vLead: number | null, v0 = p.v0): number {
+  const free = 1 - Math.pow(v / v0, p.delta);
   if (vLead === null) return p.a * free;
   const dv = v - vLead;
   const sStar = p.s0 + Math.max(0, v * p.T + (v * dv) / (2 * Math.sqrt(p.a * p.b)));
