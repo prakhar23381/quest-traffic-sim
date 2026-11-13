@@ -68,6 +68,8 @@ export interface NetVehicle extends Vehicle {
   committed: boolean;
   /** signal is not green and this vehicle is stopping for it */
   sigStop: boolean;
+  /** the signalised node the decision above refers to */
+  sigFor: NodeRT | null;
 }
 
 // --------------------------------------------------------------- constants
@@ -77,6 +79,16 @@ const REQUEST_MIN = 40; // m before the stop line at which junction entry is req
 const DIVERGE_CLEARANCE = 3; // m the rear of a diverging leader must be into its connector
 /** Firmest braking a driver accepts to stop for a signal (ITE yellow-interval value ≈ 10 ft/s²). */
 const SIGNAL_STOP_DECEL = 3.0; // m/s²
+/** Distance before a stop line at which drivers react to the signal, m. */
+const SIGNAL_DECISION_RANGE = 100;
+/**
+ * Average deceleration assumed when deciding whether a stop is still possible. The driver
+ * model's actual braking peaks well above its average over a stop: with 3.0 here, peaks
+ * reached 6.6 m/s². 2.5 keeps peaks below 5 m/s² (measured on all presets).
+ */
+const STOP_DECISION_DECEL = 2.5; // m/s² (3.0: 6.6 peak; 2.5: 4.7 peak; 2.2: later red entries, no benefit)
+/** Below this speed a vehicle can always stop at the line, m/s. */
+const CRAWL = 1;
 /**
  * Congested merging at priority junctions: once a vehicle has been stopped this
  * long, slow (queued) traffic on conflicting paths takes turns with it instead
@@ -109,8 +121,12 @@ const LC_COOLDOWN = 3; // s
 const STUCK_REROUTE = 15; // s waiting at a stop line in a lane that cannot make the turn
 /** Last resort: a vehicle stuck this long in a lane that cannot make its turn, with no reroute, is removed (counted as dropped). */
 const GIVE_UP = 180; // s
+/** Gridlock relief: head-of-queue vehicles stopped this long are removed (SUMO default). */
+const TELEPORT = 300; // s
 /** Distance before the stop line within which a blocked mandatory lane change asks the target lane to make room. */
 const COOPERATION_RANGE = 150; // m
+/** Movements of look-ahead for strategic lane choice. */
+const STRATEGIC_DEPTH = 4;
 const ROUTE_REFRESH = 10; // s
 /** Per-lane discharge rate assumed when converting an entrance queue into an expected wait. */
 const ENTRY_CAPACITY_VPH = 1900;
@@ -198,8 +214,12 @@ export class NetworkSim {
   generated = 0;
   entered = 0;
   exited = 0;
-  /** vehicles removed because no route to their destination remained */
+  /** vehicles removed, all causes (= droppedWrongLane + droppedGridlock) */
   dropped = 0;
+  /** removed after GIVE_UP s in a lane that cannot make their turn, with no alternative route */
+  droppedWrongLane = 0;
+  /** removed after TELEPORT s at the head of a queue that did not move (gridlock relief) */
+  droppedGridlock = 0;
   unserved = 0;
   rerouted = 0;
   /** vehicles that reached a stop line without approval (should stay 0) */
@@ -301,6 +321,7 @@ export class NetworkSim {
     this.transfer();
     this.laneChanges();
     this.handleStuck();
+    this.relieveGridlock();
     this.generateDemand();
     this.insertVehicles();
     this.time += dt;
@@ -340,29 +361,61 @@ export class NetworkSim {
    */
   private signalDecisions(): void {
     for (const link of this.net.links) {
-      const sig = link.to.signal;
-      if (!sig) continue;
       for (const lane of link.lanes) {
         for (const v of lane.vehicles) {
           const veh = v as NetVehicle;
-          if (veh.ri >= veh.route.length - 1) continue;
-          if (signalState(sig, veh.moves[veh.ri]!.id, this.time) === "green") {
-            veh.sigDecided = veh.committed = veh.sigStop = false;
+          // The next signal on the route within SIGNAL_DECISION_RANGE: at the end of this
+          // link, or at the end of the next one (a driver sees the light before reaching
+          // the last link; a 56 m approach link at Madiwala was entered during amber).
+          let target: NodeRT | null = null;
+          let move: MovementRT | null = null;
+          let dist = lane.length - veh.pos;
+          if (veh.ri < veh.route.length - 1) {
+            if (link.to.signal) {
+              target = link.to;
+              move = veh.moves[veh.ri]!;
+            } else if (veh.ri + 1 < veh.route.length - 1 && veh.route[veh.ri + 1]!.to.signal) {
+              const m = veh.moves[veh.ri]!;
+              const c = this.connectorFor(m, lane.index) ?? m.connectors[0]!;
+              dist += c.lane.length + veh.route[veh.ri + 1]!.length;
+              if (dist <= SIGNAL_DECISION_RANGE) {
+                target = veh.route[veh.ri + 1]!.to;
+                move = veh.moves[veh.ri + 1]!;
+              }
+            }
+          }
+          if (!target || !move) {
+            veh.sigStop = false;
             continue;
           }
-          if (!veh.sigDecided) {
-            veh.sigDecided = true;
-            // Decide with the driver model itself, so the decision and the resulting
-            // braking agree: stop only if the IDM response to the stop line is gentler
-            // than SIGNAL_STOP_DECEL. (A kinematic v²/2d test ignores the standstill gap
-            // s0 and IDM's reaction at short range, and asked for up to 9 m/s².)
-            const a = idmAccel(lane.params, veh.v, lane.length - veh.pos, 0, lane.params.v0 * veh.v0f);
-            veh.committed = a < -SIGNAL_STOP_DECEL;
+          if (signalState(target.signal!, move.id, this.time) === "green") {
+            veh.sigDecided = veh.committed = veh.sigStop = false;
+            veh.sigFor = target;
+            continue;
           }
-          veh.sigStop = !veh.committed;
+          if (!veh.sigDecided || veh.sigFor !== target) {
+            veh.sigDecided = true;
+            veh.sigFor = target;
+            veh.committed = !this.canStopBefore(veh.v, dist);
+          }
+          // Only vehicles on the approach link itself brake for its stop line; further back,
+          // the look-ahead in leader() already treats the junction ahead as a stop.
+          veh.sigStop = !veh.committed && target === link.to;
         }
       }
     }
+  }
+
+  /**
+   * Can a vehicle at speed v stop at no more than SIGNAL_STOP_DECEL before a line d metres
+   * ahead? Kinematic, measured to where the driver model actually stops (s0 before the
+   * line). History: a plain v²/2d test asked for up to 9 m/s² (it ignored s0); the driver
+   * model's own response exaggerates inside s0 and let a crawling vehicle keep its approval
+   * through 91 s of red, or withdrew it from a vehicle 0.5 m out (60–1,700 m/s²).
+   */
+  private canStopBefore(v: number, d: number): boolean {
+    if (v < CRAWL) return true;
+    return v * v <= 2 * STOP_DECISION_DECEL * Math.max(d - this.driver.s0, 0);
   }
 
   /** May this vehicle cross the stop line under the current signal state? */
@@ -380,7 +433,13 @@ export class NetworkSim {
       if (!link.to.signal) continue;
       for (const lane of link.lanes) {
         const veh = lane.vehicles[lane.vehicles.length - 1] as NetVehicle | undefined;
-        if (veh?.approved && !this.signalAllows(veh, veh.approved.movement)) this.unapprove(veh);
+        if (!veh?.approved || this.signalAllows(veh, veh.approved.movement)) continue;
+        // Withdraw only if it can still stop gently. A committed vehicle slowed by a queue
+        // beyond the junction crawled to the line after the clearance ended and had its
+        // approval withdrawn 1.1 m out (438 m/s²). Crossing traffic is kept clear of its
+        // path by the conflict rules, and its lateness is recorded (maxRedEntryLateness).
+        const d = lane.length - veh.pos;
+        if (this.canStopBefore(veh.v, d)) this.unapprove(veh);
       }
     }
   }
@@ -450,15 +509,29 @@ export class NetworkSim {
         // A stream with right of way may only be asked for a token adjustment; equals take turns.
         const theyHavePriority = !node.signal && other.movement.inLink.priority > m.inLink.priority;
         const limitForThem = theyHavePriority ? PRIORITY_DISTURBANCE : b;
+        // If refused, this vehicle must stop at the line: that braking is the alternative.
+        const myStop = idmAccel(c.inLane.params, veh.v, d, 0, c.inLane.params.v0 * veh.v0f);
         const check = (w: NetVehicle, wRem: number, wLane: SimLane) => {
+          let gap: number;
+          let harm: number; // braking that approving would cause (to us or to w)
           if (wRem < mine) {
-            const gap = mine - wRem - w.len;
+            gap = mine - wRem - w.len;
             const vW = Math.min(w.v, other.v0 * w.v0f);
-            if (gap < s0 || idmAccel(c.inLane.params, veh.v, gap, vW) < -b) blocked = true;
+            harm = idmAccel(c.inLane.params, veh.v, gap, vW);
           } else {
-            const gap = wRem - mine - veh.len;
-            if (gap < s0 || idmAccel(wLane.params, w.v, gap, vMe) < -limitForThem) blocked = true;
+            gap = wRem - mine - veh.len;
+            harm = idmAccel(wLane.params, w.v, gap, vMe);
+            if (theyHavePriority) {
+              // Traffic with right of way is protected strictly.
+              if (gap < s0 || harm < -limitForThem) blocked = true;
+              return;
+            }
           }
+          // Between equal streams choose the lesser harm: refuse only if approving would be
+          // uncomfortable AND worse than stopping at the line, or if there is no room at all.
+          // (Refusing on comfort alone made a lane-drop follower stop from 14 m/s in 17 m.)
+          if (gap < 0.5) blocked = true;
+          else if ((gap < s0 || harm < -b) && harm < myStop) blocked = true;
         };
         for (const w of other.lane.vehicles) check(w as NetVehicle, other.lane.length - w.pos, other.lane);
         if (!blocked && other.reserved > 0) {
@@ -538,7 +611,15 @@ export class NetworkSim {
     const vs = lane.vehicles;
     if (idx < vs.length) {
       const ld = vs[idx]!;
-      return { gap: ld.pos - ld.len - veh.pos, vLead: ld.v, v0cap: Infinity };
+      const gap = ld.pos - ld.len - veh.pos;
+      if (lane.kind === "conn") {
+        // On a connector, a vehicle on a merging (or diverging) connector may be nearer than
+        // the vehicle ahead on our own. (Returning the own-lane leader alone let a vehicle
+        // drive into a stopped vehicle on the other half of a lane drop.)
+        const ml = sideLeader(lane.conn!, lane.length - veh.pos, veh.pos, null);
+        if (ml && ml.gap < gap) return { gap: ml.gap, vLead: ml.v, v0cap: Infinity };
+      }
+      return { gap, vLead: ld.v, v0cap: Infinity };
     }
     let d = lane.length - veh.pos;
     let r = veh.ri;
@@ -622,6 +703,7 @@ export class NetworkSim {
       }
     }
     this.lookPastLeader();
+    this.giveWayAnticipation();
     // Vehicles stopping for a signal brake for the stop line even when they are not at the front.
     for (const link of this.net.links) {
       if (!link.to.signal) continue;
@@ -655,6 +737,36 @@ export class NetworkSim {
   }
 
   /**
+   * Approaching a give-way junction on a movement that must yield, a driver keeps to a
+   * speed from which it can still stop at the line comfortably, whatever the vehicle ahead
+   * does: entry may be refused once it reaches the front. (Followers kept 14 m/s behind an
+   * accelerating leader, were refused 20 m out, and braked at 18 m/s².) Movements with
+   * priority are unaffected, so main-road capacity is unchanged.
+   */
+  private giveWayAnticipation(): void {
+    const b = this.driver.b;
+    const s0 = this.driver.s0;
+    for (const link of this.net.links) {
+      const node = link.to;
+      if (node.kind !== "priority") continue;
+      for (const lane of link.lanes) {
+        for (const v of lane.vehicles) {
+          const veh = v as NetVehicle;
+          if (veh.approved || veh.ri >= veh.route.length - 1) continue;
+          const d = lane.length - veh.pos;
+          if (d > this.requestDist(veh.v)) continue;
+          const c = this.connectorFor(veh.moves[veh.ri]!, lane.index);
+          if (!c || !mustYield(c)) continue;
+          const cap = Math.sqrt(2 * b * Math.max(0, d - s0));
+          if (veh.v <= cap) continue;
+          const a = idmAccel(lane.params, veh.v, Infinity, null, Math.max(cap, 0.1));
+          if (a < veh.acc) veh.acc = Math.max(a, -b);
+        }
+      }
+    }
+  }
+
+  /**
    * A vehicle near a stop line also watches the nearest vehicle on its OWN path through
    * the junction, not only the vehicle ahead in its lane. Otherwise, when the vehicle
    * ahead turns off onto a different connector, it can reveal a stopped queue a few
@@ -671,7 +783,14 @@ export class NetworkSim {
           if (d > this.requestDist(veh.v)) break; // vehicles further back are further away still
           if (veh.ri >= veh.route.length - 1) continue;
           const c = this.connectorFor(veh.moves[veh.ri]!, lane.index);
-          if (!c) continue;
+          if (!c) {
+            // Wrong lane for the next turn: it cannot cross the line from here, so it must be
+            // ready to stop there even while following a leader that can. (Otherwise the stop
+            // line appeared 16 m ahead at 12 m/s the moment the leader crossed: 16 m/s².)
+            const a = idmAccel(lane.params, veh.v, d, 0, lane.params.v0 * veh.v0f);
+            if (a < veh.acc) veh.acc = a;
+            continue;
+          }
           let gap: number;
           let vLead: number;
           const onConn = c.lane.vehicles[0];
@@ -773,7 +892,6 @@ export class NetworkSim {
         veh.ri++;
         veh.lane = c.outLane;
         veh.tLinkEnter = this.time + this.dt;
-        veh.sigDecided = veh.committed = veh.sigStop = false;
         this.linkStats[c.outLane.link!.idx]!.entered++;
       }
     }
@@ -803,10 +921,18 @@ export class NetworkSim {
   private preferredLanes(moves: MovementRT[], ri: number): number[] | null {
     const m = moves[ri];
     if (!m) return null;
-    const after = moves[ri + 1];
-    if (!after) return m.inLanes;
-    const pref = m.inLanes.filter((_, k) => after.inLanes.includes(m.connectors[k]!.outLane.index));
-    return pref.length ? pref : m.inLanes;
+    // Work backwards from STRATEGIC_DEPTH movements ahead: at each step keep the lanes
+    // whose connector lands in a lane still preferred for the movement after it. Two
+    // movements of look-ahead were not enough at Silk Board: left-turners reached a
+    // queued 114 m approach in the wrong lane and could not cross the queue.
+    const last = Math.min(moves.length - 1, ri + STRATEGIC_DEPTH - 1);
+    let target: number[] = moves[last]!.inLanes;
+    for (let j = last - 1; j >= ri; j--) {
+      const mj = moves[j]!;
+      const ok = mj.inLanes.filter((_, k) => target.includes(mj.connectors[k]!.outLane.index));
+      target = ok.length ? ok : mj.inLanes;
+    }
+    return target;
   }
 
   private laneChanges(): void {
@@ -832,7 +958,10 @@ export class NetworkSim {
           if (pref && !pref.includes(cur)) {
             // Strategic: allowed, but the turn after next is easier from another lane.
             const step = pref[0]! > cur ? 1 : -1;
-            if (allowed!.includes(cur + step)) this.tryChange(veh, lane, link.lanes[cur + step]!, true);
+            if (allowed!.includes(cur + step)) {
+              const target = link.lanes[cur + step]!;
+              if (!this.tryChange(veh, lane, target, true) && d < COOPERATION_RANGE) this.mergeRequests.push({ veh, target });
+            }
             continue;
           }
           if (d < 30) continue; // no discretionary changes close to the stop line
@@ -871,6 +1000,10 @@ export class NetworkSim {
     }
     const fl = vs[idx - 1] as NetVehicle | undefined;
     if (fl && veh.pos - veh.len - fl.pos < minGap) return null;
+    // Never cut in front of a vehicle already approved to enter the junction. Approvals are
+    // held only by the front vehicle of a lane; a lane change in front of it broke that, and
+    // two vehicles reached a merge side by side (342 m/s² on the Braess network).
+    if (!ld && fl?.approved) return null;
     if (!fl) {
       // No follower in the target lane itself: the next vehicle to arrive may still be
       // on a junction connector feeding it. It must not be cut off either.
@@ -921,6 +1054,31 @@ export class NetworkSim {
     veh.lcAllowedAt = this.time + (mandatory ? LC_COOLDOWN / 2 : LC_COOLDOWN);
   }
 
+  /** Remove a vehicle from the network, releasing any reservation it holds. */
+  private remove(veh: NetVehicle): void {
+    const lane = veh.lane;
+    lane.vehicles.splice(lane.vehicles.indexOf(veh), 1);
+    if (veh.approved) this.unapprove(veh);
+    if (lane.kind === "conn") lane.conn!.outLane.pending -= veh.len + this.driver.s0;
+    this.dropped++;
+    this.odStreams[veh.od]!.stats.dropped++;
+  }
+
+  /**
+   * Gridlock relief, as in SUMO's time-to-teleport (default 300 s): the head of a queue
+   * that has not moved for TELEPORT s is removed and counted. Without it, one local
+   * lock-up freezes the rest of the run and makes scenario comparisons meaningless.
+   */
+  private relieveGridlock(): void {
+    for (const lane of this.net.lanes) {
+      const veh = lane.vehicles[lane.vehicles.length - 1] as NetVehicle | undefined;
+      if (!veh || veh.stoppedFor < TELEPORT) continue;
+      // A vehicle waiting at a red light is not stuck: the longest red is < 180 s.
+      this.remove(veh);
+      this.droppedGridlock++;
+    }
+  }
+
   /** A vehicle stuck at a stop line in a lane that cannot make its turn picks a new route from there. */
   private handleStuck(): void {
     for (const link of this.net.links) {
@@ -941,9 +1099,8 @@ export class NetworkSim {
           // No alternative route from this lane. Keep waiting for a gap (others yield),
           // but never deadlock forever: after GIVE_UP s the vehicle is removed and counted.
           if (veh.stoppedFor >= GIVE_UP) {
-            lane.vehicles.pop();
-            this.dropped++;
-            this.odStreams[veh.od]!.stats.dropped++;
+            this.remove(veh);
+            this.droppedWrongLane++;
           }
           continue;
         }
@@ -996,6 +1153,13 @@ export class NetworkSim {
           }
         }
         if (!bestLane) break;
+        // The road continues beyond the study area, so a real driver would already know about
+        // the junction at the end of this link. Enter no faster than allows a comfortable stop
+        // before it (its entry may be refused). Without this, vehicles created at 15–20 m/s on
+        // 29–56 m entry links at Silk Board braked at 35–214 m/s².
+        if (p.route.length > 1) {
+          bestV = Math.min(bestV, Math.sqrt(2 * this.driver.b * Math.max(0, link.length - this.driver.s0)));
+        }
         q.shift();
         this.spawn(p, bestLane, bestV);
       }
@@ -1007,7 +1171,7 @@ export class NetworkSim {
     const veh: NetVehicle = {
       id: this.nextId++, pos: 0, v, acc: 0, len: 4.5, params: lane.params, tSpawn: p.tGen,
       lane, route: p.route, moves: p.moves, ri: 0, approved: null, od: this.odStreams.indexOf(p.od), v0f,
-      tLinkEnter: this.time, tFree: p.tFree, lcAllowedAt: this.time + 1, stoppedFor: 0, dist: 0, lcFromIndex: lane.index, lcTime: -Infinity, sigDecided: false, committed: false, sigStop: false,
+      tLinkEnter: this.time, tFree: p.tFree, lcAllowedAt: this.time + 1, stoppedFor: 0, dist: 0, lcFromIndex: lane.index, lcTime: -Infinity, sigDecided: false, committed: false, sigStop: false, sigFor: null,
     };
     lane.vehicles.unshift(veh);
     this.entered++;
@@ -1067,6 +1231,7 @@ export class NetworkSim {
       for (let i = 0; i < vs.length; i++) {
         const v = vs[i] as NetVehicle;
         if (v.lane !== lane) errs.push(`veh ${v.id} lane pointer mismatch`);
+        if (v.approved && i !== vs.length - 1) errs.push(`veh ${v.id} holds an approval but is not the front of its lane`);
         if (!(v.v >= 0) || !Number.isFinite(v.pos)) errs.push(`veh ${v.id} bad state v=${v.v} pos=${v.pos}`);
         if (v.pos > lane.length + 1e-6) errs.push(`veh ${v.id} beyond lane end`);
         if (i > 0) {
@@ -1152,8 +1317,10 @@ function sideLeader(c: ConnectorRT, myRem: number, myPos: number, best: { gap: n
         const gap = myRem - wRem - w.len;
         if (!best || gap < best.gap) best = { gap, v: w.v };
       }
-      // ...and the vehicle already approved for that connector but still on its approach.
-      if (other.reserved > 0 && other.lane.vehicles.length === 0) {
+      // ...and the vehicle already approved for that connector but still on its approach,
+      // whether or not the connector is occupied. (Considering it only when the connector
+      // was empty made it "appear" 2 m ahead the moment the connector emptied.)
+      if (other.reserved > 0) {
         const a = other.inLane.vehicles[other.inLane.vehicles.length - 1] as NetVehicle | undefined;
         if (a && a.approved === other) {
           const aRem = other.lane.length + other.inLane.length - a.pos;
@@ -1171,6 +1338,19 @@ function sideLeader(c: ConnectorRT, myRem: number, myPos: number, best: { gap: n
     }
   }
   return best;
+}
+
+/** Does traffic on this connector have to give way (a crossing path, or merging into traffic with priority)? */
+function mustYield(c: ConnectorRT): boolean {
+  const mine = c.movement.inLink.priority;
+  for (const { other, kind } of c.conflicts) {
+    if (kind === "cross") return true;
+    // Merging into traffic with priority, or into an equal stream (a lane drop): entry may
+    // be refused when the other lane has the gap. (At Silk Board, a 2-lane road dropping
+    // into a 1-lane slip road produced all 17 braking events above 1 g per 3 hours.)
+    if (kind === "merge" && other.movement.inLink.priority >= mine) return true;
+  }
+  return false;
 }
 
 /** Is the movement in the all-red clearance interval that follows its own amber? */

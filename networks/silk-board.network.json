@@ -1,0 +1,2351 @@
+{
+ "id": "silk-board",
+ "name": "Silk Board junction, Bengaluru",
+ "description": "Built from OpenStreetMap. Lane counts and speed limits missing in OSM are imputed by road class.",
+ "nodes": [
+  {
+   "id": "n0",
+   "x": -651.02,
+   "y": -145.04,
+   "kind": "boundary"
+  },
+  {
+   "id": "n1",
+   "x": -651.02,
+   "y": -116.96,
+   "kind": "boundary"
+  },
+  {
+   "id": "n2",
+   "x": -651.02,
+   "y": -112.94,
+   "kind": "boundary"
+  },
+  {
+   "id": "n3",
+   "x": -651.02,
+   "y": -102.33,
+   "kind": "boundary"
+  },
+  {
+   "id": "n4",
+   "x": -651.02,
+   "y": -97.38,
+   "kind": "boundary"
+  },
+  {
+   "id": "n5",
+   "x": -619.32,
+   "y": -117.25,
+   "kind": "priority"
+  },
+  {
+   "id": "n6",
+   "x": -517.27,
+   "y": -118.41,
+   "kind": "priority"
+  },
+  {
+   "id": "n7",
+   "x": -429.17,
+   "y": -112.18,
+   "kind": "priority"
+  },
+  {
+   "id": "n8",
+   "x": -426.41,
+   "y": -110.15,
+   "kind": "priority"
+  },
+  {
+   "id": "n9",
+   "x": -333.29,
+   "y": -107.88,
+   "kind": "priority"
+  },
+  {
+   "id": "n10",
+   "x": -318.75,
+   "y": 497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n11",
+   "x": -304.89,
+   "y": 497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n12",
+   "x": -295.68,
+   "y": -66.71,
+   "kind": "priority"
+  },
+  {
+   "id": "n13",
+   "x": -284.0,
+   "y": -71.76,
+   "kind": "priority"
+  },
+  {
+   "id": "n14",
+   "x": -272.57,
+   "y": 436.5,
+   "kind": "signal"
+  },
+  {
+   "id": "n15",
+   "x": -221.82,
+   "y": 452.4,
+   "kind": "priority"
+  },
+  {
+   "id": "n16",
+   "x": -209.99,
+   "y": 335.01,
+   "kind": "priority"
+  },
+  {
+   "id": "n17",
+   "x": -190.24,
+   "y": 274.18,
+   "kind": "priority"
+  },
+  {
+   "id": "n18",
+   "x": -170.75,
+   "y": 497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n19",
+   "x": -164.11,
+   "y": 240.8,
+   "kind": "priority"
+  },
+  {
+   "id": "n20",
+   "x": -154.14,
+   "y": 177.46,
+   "kind": "priority"
+  },
+  {
+   "id": "n21",
+   "x": -146.94,
+   "y": 238.99,
+   "kind": "priority"
+  },
+  {
+   "id": "n22",
+   "x": -144.88,
+   "y": 497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n23",
+   "x": -144.65,
+   "y": -67.75,
+   "kind": "priority"
+  },
+  {
+   "id": "n24",
+   "x": -143.09,
+   "y": -31.34,
+   "kind": "priority"
+  },
+  {
+   "id": "n25",
+   "x": -139.06,
+   "y": -46.81,
+   "kind": "priority"
+  },
+  {
+   "id": "n26",
+   "x": -102.34,
+   "y": 156.52,
+   "kind": "priority"
+  },
+  {
+   "id": "n27",
+   "x": -93.8,
+   "y": 161.81,
+   "kind": "priority"
+  },
+  {
+   "id": "n28",
+   "x": -90.23,
+   "y": -30.03,
+   "kind": "priority"
+  },
+  {
+   "id": "n29",
+   "x": -66.78,
+   "y": 144.25,
+   "kind": "priority"
+  },
+  {
+   "id": "n30",
+   "x": -47.37,
+   "y": 88.06,
+   "kind": "priority"
+  },
+  {
+   "id": "n31",
+   "x": -8.97,
+   "y": 99.99,
+   "kind": "priority"
+  },
+  {
+   "id": "n32",
+   "x": 1.77,
+   "y": 13.56,
+   "kind": "signal"
+  },
+  {
+   "id": "n33",
+   "x": 51.47,
+   "y": -90.33,
+   "kind": "priority"
+  },
+  {
+   "id": "n34",
+   "x": 79.64,
+   "y": 18.47,
+   "kind": "priority"
+  },
+  {
+   "id": "n35",
+   "x": 90.88,
+   "y": 55.39,
+   "kind": "priority"
+  },
+  {
+   "id": "n36",
+   "x": 97.01,
+   "y": -497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n37",
+   "x": 108.85,
+   "y": -130.85,
+   "kind": "boundary"
+  },
+  {
+   "id": "n38",
+   "x": 123.89,
+   "y": -235.91,
+   "kind": "priority"
+  },
+  {
+   "id": "n39",
+   "x": 135.04,
+   "y": -230.06,
+   "kind": "priority"
+  },
+  {
+   "id": "n40",
+   "x": 137.47,
+   "y": -277.82,
+   "kind": "priority"
+  },
+  {
+   "id": "n41",
+   "x": 160.01,
+   "y": -251.42,
+   "kind": "priority"
+  },
+  {
+   "id": "n42",
+   "x": 170.89,
+   "y": 69.43,
+   "kind": "priority"
+  },
+  {
+   "id": "n43",
+   "x": 171.8,
+   "y": 53.3,
+   "kind": "priority"
+  },
+  {
+   "id": "n44",
+   "x": 172.68,
+   "y": -296.38,
+   "kind": "priority"
+  },
+  {
+   "id": "n45",
+   "x": 201.7,
+   "y": -345.54,
+   "kind": "priority"
+  },
+  {
+   "id": "n46",
+   "x": 210.13,
+   "y": 56.2,
+   "kind": "priority"
+  },
+  {
+   "id": "n47",
+   "x": 255.88,
+   "y": -461.39,
+   "kind": "priority"
+  },
+  {
+   "id": "n48",
+   "x": 277.59,
+   "y": -497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n49",
+   "x": 292.96,
+   "y": -497.43,
+   "kind": "boundary"
+  },
+  {
+   "id": "n50",
+   "x": 318.99,
+   "y": 66.51,
+   "kind": "priority"
+  },
+  {
+   "id": "n51",
+   "x": 403.57,
+   "y": 42.45,
+   "kind": "priority"
+  },
+  {
+   "id": "n52",
+   "x": 449.96,
+   "y": -3.1,
+   "kind": "priority"
+  },
+  {
+   "id": "n53",
+   "x": 469.69,
+   "y": 22.9,
+   "kind": "priority"
+  },
+  {
+   "id": "n54",
+   "x": 579.18,
+   "y": -45.72,
+   "kind": "priority"
+  },
+  {
+   "id": "n55",
+   "x": 605.77,
+   "y": -55.97,
+   "kind": "boundary"
+  },
+  {
+   "id": "n56",
+   "x": 651.02,
+   "y": -52.09,
+   "kind": "boundary"
+  },
+  {
+   "id": "n57",
+   "x": 651.02,
+   "y": -37.39,
+   "kind": "boundary"
+  },
+  {
+   "id": "n58",
+   "x": 651.02,
+   "y": -24.84,
+   "kind": "boundary"
+  }
+ ],
+ "links": [
+  {
+   "id": "w40696219+",
+   "from": "n21",
+   "to": "n29",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -137.17,
+     235.27
+    ],
+    [
+     -96.49,
+     188.75
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 40696219,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w40696219+2",
+   "from": "n29",
+   "to": "n30",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -58.7,
+     127.86
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 40696219,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w40696221+",
+   "from": "n27",
+   "to": "n39",
+   "lanes": 3,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -88.8,
+     153.98
+    ],
+    [
+     -49.99,
+     93.26
+    ],
+    [
+     10.04,
+     -6.59
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silk Board Flyover",
+   "osm": {
+    "way": 40696221,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w40696222+",
+   "from": "n38",
+   "to": "n26",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     59.37,
+     -116.83
+    ],
+    [
+     -1.13,
+     -10.15
+    ],
+    [
+     -7.02,
+     -0.36
+    ],
+    [
+     -35.19,
+     46.43
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silk Board Flyover",
+   "osm": {
+    "way": 40696222,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w40696223+",
+   "from": "n16",
+   "to": "n21",
+   "lanes": 2,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -205.49,
+     327.1
+    ],
+    [
+     -196.98,
+     316.12
+    ],
+    [
+     -156.88,
+     256.51
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 40696223,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w92196679+",
+   "from": "n22",
+   "to": "n15",
+   "lanes": 3,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -184.51,
+     474.24
+    ]
+   ],
+   "offset": 0,
+   "name": "Madiwala Sarjapura Road",
+   "osm": {
+    "way": 92196679,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w133763765+",
+   "from": "n19",
+   "to": "n17",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 133763765,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w160330784+",
+   "from": "n32",
+   "to": "n30",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -53.48,
+     4.65
+    ],
+    [
+     -46.53,
+     14.8
+    ],
+    [
+     -43.29,
+     22.21
+    ],
+    [
+     -41.21,
+     30.93
+    ],
+    [
+     -42.1,
+     40.44
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 160330784,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w160331538+",
+   "from": "n30",
+   "to": "n32",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -32.37,
+     86.57
+    ],
+    [
+     -7.89,
+     45.33
+    ],
+    [
+     -0.5,
+     27.73
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 160331538,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w160331539+",
+   "from": "n29",
+   "to": "n30",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -58.67,
+     138.69
+    ],
+    [
+     -52.01,
+     134.12
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 160331539,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w160331539+2",
+   "from": "n30",
+   "to": "n32",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -29.45,
+     96.6
+    ],
+    [
+     -6.6,
+     56.61
+    ],
+    [
+     -1.44,
+     49.44
+    ],
+    [
+     7.45,
+     43.14
+    ],
+    [
+     21.0,
+     38.41
+    ],
+    [
+     32.67,
+     39.74
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 160331539,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w160331539+3",
+   "from": "n32",
+   "to": "n35",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "offset": 0,
+   "osm": {
+    "way": 160331539,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w172853382+",
+   "from": "n11",
+   "to": "n14",
+   "lanes": 2,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -280.99,
+     458.17
+    ],
+    [
+     -278.79,
+     454.63
+    ],
+    [
+     -276.21,
+     450.46
+    ],
+    [
+     -274.43,
+     447.62
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 172853382,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w229976708+",
+   "from": "n36",
+   "to": "n47",
+   "lanes": 1,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     99.08,
+     -496.37
+    ],
+    [
+     111.04,
+     -483.14
+    ],
+    [
+     114.56,
+     -479.68
+    ],
+    [
+     120.36,
+     -478.25
+    ],
+    [
+     151.77,
+     -484.07
+    ],
+    [
+     169.22,
+     -486.9
+    ],
+    [
+     188.4,
+     -482.75
+    ],
+    [
+     205.67,
+     -478.96
+    ],
+    [
+     235.97,
+     -473.2
+    ],
+    [
+     241.22,
+     -470.51
+    ]
+   ],
+   "name": "Tank Bund Road",
+   "osm": {
+    "way": 229976708,
+    "highway": "secondary"
+   }
+  },
+  {
+   "id": "w229976708-",
+   "from": "n47",
+   "to": "n36",
+   "lanes": 1,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     241.22,
+     -470.51
+    ],
+    [
+     235.97,
+     -473.2
+    ],
+    [
+     205.67,
+     -478.96
+    ],
+    [
+     188.4,
+     -482.75
+    ],
+    [
+     169.22,
+     -486.9
+    ],
+    [
+     151.77,
+     -484.07
+    ],
+    [
+     120.36,
+     -478.25
+    ],
+    [
+     114.56,
+     -479.68
+    ],
+    [
+     111.04,
+     -483.14
+    ],
+    [
+     99.08,
+     -496.37
+    ]
+   ],
+   "name": "Tank Bund Road",
+   "osm": {
+    "way": 229976708,
+    "highway": "secondary"
+   }
+  },
+  {
+   "id": "w230423164+",
+   "from": "n32",
+   "to": "n30",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "offset": 0,
+   "osm": {
+    "way": 230423164,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w237025636+",
+   "from": "n39",
+   "to": "n44",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     154.7,
+     -264.07
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 237025636,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w239438610+",
+   "from": "n14",
+   "to": "n18",
+   "lanes": 3,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -256.87,
+     449.3
+    ],
+    [
+     -236.72,
+     460.0
+    ],
+    [
+     -212.94,
+     472.95
+    ],
+    [
+     -199.67,
+     480.17
+    ]
+   ],
+   "offset": 0,
+   "name": "Madiwala Sarjapura Road",
+   "osm": {
+    "way": 239438610,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w243897292+",
+   "from": "n40",
+   "to": "n38",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 243897292,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w243897293+",
+   "from": "n45",
+   "to": "n49",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     257.3,
+     -438.66
+    ],
+    [
+     276.73,
+     -470.81
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 243897293,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w245809758+",
+   "from": "n33",
+   "to": "n28",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     6.75,
+     -68.02
+    ],
+    [
+     -2.4,
+     -65.28
+    ],
+    [
+     -16.64,
+     -60.59
+    ],
+    [
+     -30.37,
+     -55.45
+    ],
+    [
+     -36.29,
+     -53.16
+    ],
+    [
+     -51.13,
+     -46.71
+    ],
+    [
+     -58.57,
+     -43.84
+    ],
+    [
+     -67.14,
+     -38.56
+    ],
+    [
+     -70.66,
+     -37.24
+    ],
+    [
+     -75.93,
+     -35.26
+    ]
+   ],
+   "offset": 0,
+   "name": "NH48",
+   "osm": {
+    "way": 245809758,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w312174028+",
+   "from": "n32",
+   "to": "n28",
+   "lanes": 3,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -54.13,
+     -13.28
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 312174028,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w377124830+",
+   "from": "n33",
+   "to": "n37",
+   "lanes": 2,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     82.51,
+     -97.1
+    ],
+    [
+     85.12,
+     -98.81
+    ],
+    [
+     87.56,
+     -104.35
+    ],
+    [
+     95.25,
+     -120.61
+    ],
+    [
+     99.48,
+     -125.52
+    ],
+    [
+     104.09,
+     -128.7
+    ]
+   ],
+   "offset": 0,
+   "name": "Srinagar - Kanyakumari Highway",
+   "osm": {
+    "way": 377124830,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w377132617+",
+   "from": "n40",
+   "to": "n33",
+   "lanes": 2,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     92.39,
+     -216.49
+    ]
+   ],
+   "offset": 0,
+   "name": "Srinagar - Kanyakumari Highway",
+   "osm": {
+    "way": 377132617,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w380980308+",
+   "from": "n56",
+   "to": "n34",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     649.79,
+     -51.99
+    ],
+    [
+     627.75,
+     -49.77
+    ],
+    [
+     605.38,
+     -43.67
+    ],
+    [
+     346.7,
+     35.96
+    ],
+    [
+     320.73,
+     41.8
+    ],
+    [
+     298.93,
+     45.34
+    ],
+    [
+     275.07,
+     46.23
+    ],
+    [
+     252.93,
+     46.69
+    ],
+    [
+     230.8,
+     46.03
+    ],
+    [
+     207.14,
+     45.42
+    ],
+    [
+     178.52,
+     39.58
+    ],
+    [
+     175.44,
+     38.95
+    ],
+    [
+     159.11,
+     36.5
+    ],
+    [
+     119.22,
+     30.52
+    ],
+    [
+     108.55,
+     28.2
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 380980308,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w464465164+",
+   "from": "n30",
+   "to": "n17",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -88.87,
+     115.68
+    ],
+    [
+     -109.32,
+     147.42
+    ],
+    [
+     -140.51,
+     190.58
+    ],
+    [
+     -173.81,
+     233.46
+    ],
+    [
+     -177.48,
+     242.55
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 464465164,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w464465165+",
+   "from": "n17",
+   "to": "n14",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -211.52,
+     310.18
+    ],
+    [
+     -235.2,
+     350.27
+    ],
+    [
+     -250.03,
+     375.37
+    ],
+    [
+     -271.71,
+     412.05
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 464465165,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w491889864+",
+   "from": "n7",
+   "to": "n5",
+   "lanes": 1,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -451.96,
+     -111.72
+    ],
+    [
+     -508.4,
+     -111.88
+    ],
+    [
+     -582.92,
+     -113.16
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 491889864,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w491889865+",
+   "from": "n4",
+   "to": "n13",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -622.04,
+     -97.47
+    ],
+    [
+     -570.44,
+     -93.86
+    ],
+    [
+     -442.85,
+     -93.48
+    ],
+    [
+     -383.41,
+     -91.91
+    ],
+    [
+     -364.04,
+     -89.65
+    ],
+    [
+     -316.62,
+     -81.03
+    ],
+    [
+     -300.76,
+     -76.53
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 491889865,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w491889865+2",
+   "from": "n13",
+   "to": "n24",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -191.68,
+     -46.99
+    ],
+    [
+     -183.86,
+     -44.47
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 491889865,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w519734960+",
+   "from": "n20",
+   "to": "n31",
+   "lanes": 4,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -150.25,
+     181.98
+    ],
+    [
+     -138.35,
+     192.35
+    ],
+    [
+     -128.93,
+     201.62
+    ],
+    [
+     -119.39,
+     207.02
+    ],
+    [
+     -100.25,
+     210.04
+    ],
+    [
+     -81.9,
+     206.36
+    ],
+    [
+     -67.27,
+     199.28
+    ],
+    [
+     -55.05,
+     186.64
+    ],
+    [
+     -43.62,
+     170.73
+    ],
+    [
+     -29.35,
+     144.17
+    ],
+    [
+     -20.19,
+     124.78
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 519734960,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w559801783+",
+   "from": "n24",
+   "to": "n32",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -83.66,
+     -11.07
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 559801783,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w688824218+",
+   "from": "n14",
+   "to": "n10",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -311.32,
+     484.32
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 688824218,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w886153772+",
+   "from": "n3",
+   "to": "n12",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -617.98,
+     -101.52
+    ],
+    [
+     -568.06,
+     -98.15
+    ],
+    [
+     -414.56,
+     -95.74
+    ],
+    [
+     -377.69,
+     -94.59
+    ],
+    [
+     -354.24,
+     -90.87
+    ],
+    [
+     -330.04,
+     -81.42
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Ragigudda-Silk Board Integrated Flyover",
+   "osm": {
+    "way": 886153772,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w886153773+",
+   "from": "n8",
+   "to": "n2",
+   "lanes": 2,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -484.52,
+     -108.96
+    ],
+    [
+     -566.26,
+     -109.15
+    ],
+    [
+     -619.68,
+     -112.67
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "osm": {
+    "way": 886153773,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w1073384217+",
+   "from": "n32",
+   "to": "n43",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     89.84,
+     39.96
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1073384217,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1090570628+",
+   "from": "n35",
+   "to": "n42",
+   "lanes": 1,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     97.6,
+     56.57
+    ]
+   ],
+   "offset": 0,
+   "name": "Service Road",
+   "osm": {
+    "way": 1090570628,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w1090570629+",
+   "from": "n43",
+   "to": "n46",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1090570629,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1108993651+",
+   "from": "n28",
+   "to": "n25",
+   "lanes": 1,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -93.77,
+     -31.25
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1108993651,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1108993653+",
+   "from": "n25",
+   "to": "n9",
+   "lanes": 1,
+   "speedLimitKmh": 50,
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1108993653,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1109948700+",
+   "from": "n32",
+   "to": "n33",
+   "lanes": 2,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     25.47,
+     1.67
+    ]
+   ],
+   "offset": 0,
+   "name": "Srinagar - Kanyakumari Highway",
+   "osm": {
+    "way": 1109948700,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w1109948890+",
+   "from": "n34",
+   "to": "n32",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     39.14,
+     13.68
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1109948890,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1148717038+",
+   "from": "n14",
+   "to": "n16",
+   "lanes": 2,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -245.19,
+     396.02
+    ],
+    [
+     -228.41,
+     365.32
+    ],
+    [
+     -225.18,
+     359.42
+    ],
+    [
+     -222.75,
+     355.62
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 1148717038,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1155963376+",
+   "from": "n48",
+   "to": "n47",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 1155963376,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1155963376+2",
+   "from": "n47",
+   "to": "n40",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     218.19,
+     -398.84
+    ],
+    [
+     169.56,
+     -320.96
+    ]
+   ],
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 1155963376,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1167293937+",
+   "from": "n5",
+   "to": "n1",
+   "lanes": 1,
+   "speedLimitKmh": 50,
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1167293937,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1208112302+",
+   "from": "n26",
+   "to": "n19",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     -130.72,
+     195.48
+    ]
+   ],
+   "offset": 0,
+   "name": "Silk Board Flyover",
+   "osm": {
+    "way": 1208112302,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1208112303+",
+   "from": "n21",
+   "to": "n27",
+   "lanes": 3,
+   "speedLimitKmh": 40,
+   "offset": 0,
+   "name": "Silk Board Flyover",
+   "osm": {
+    "way": 1208112303,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1254771465+",
+   "from": "n52",
+   "to": "n23",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     399.76,
+     13.52
+    ],
+    [
+     353.2,
+     26.52
+    ],
+    [
+     332.53,
+     32.16
+    ],
+    [
+     311.14,
+     36.93
+    ],
+    [
+     285.54,
+     39.24
+    ],
+    [
+     259.78,
+     40.68
+    ],
+    [
+     233.99,
+     40.79
+    ],
+    [
+     201.08,
+     37.36
+    ],
+    [
+     60.72,
+     7.43
+    ],
+    [
+     1.99,
+     -31.78
+    ],
+    [
+     -37.42,
+     -39.96
+    ],
+    [
+     -74.37,
+     -47.47
+    ],
+    [
+     -100.61,
+     -55.39
+    ]
+   ],
+   "layer": 2,
+   "offset": 0,
+   "name": "Silk Board Interchange",
+   "osm": {
+    "way": 1254771465,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1292043921+",
+   "from": "n5",
+   "to": "n0",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -636.86,
+     -122.68
+    ]
+   ],
+   "offset": 0,
+   "name": "Tank Bund Road",
+   "osm": {
+    "way": 1292043921,
+    "highway": "secondary"
+   }
+  },
+  {
+   "id": "w1299917512+",
+   "from": "n31",
+   "to": "n41",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     12.79,
+     55.14
+    ],
+    [
+     56.91,
+     -35.16
+    ],
+    [
+     73.19,
+     -89.77
+    ],
+    [
+     99.41,
+     -140.79
+    ],
+    [
+     130.93,
+     -199.24
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 1299917512,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w1299917514+",
+   "from": "n12",
+   "to": "n20",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -289.26,
+     -62.72
+    ],
+    [
+     -276.5,
+     -52.0
+    ],
+    [
+     -259.95,
+     -37.12
+    ],
+    [
+     -251.35,
+     -30.07
+    ],
+    [
+     -236.25,
+     -17.11
+    ],
+    [
+     -211.95,
+     10.87
+    ],
+    [
+     -184.54,
+     46.97
+    ],
+    [
+     -176.62,
+     57.26
+    ],
+    [
+     -163.56,
+     80.24
+    ],
+    [
+     -161.39,
+     87.76
+    ],
+    [
+     -159.41,
+     99.87
+    ],
+    [
+     -157.09,
+     120.17
+    ],
+    [
+     -156.62,
+     154.59
+    ],
+    [
+     -153.0,
+     169.75
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Ramp A",
+   "osm": {
+    "way": 1299917514,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w1299917517+",
+   "from": "n31",
+   "to": "n50",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     22.56,
+     73.21
+    ],
+    [
+     40.05,
+     62.64
+    ],
+    [
+     58.03,
+     54.26
+    ],
+    [
+     73.79,
+     51.67
+    ],
+    [
+     109.32,
+     51.81
+    ],
+    [
+     130.62,
+     54.84
+    ],
+    [
+     151.51,
+     58.53
+    ],
+    [
+     175.45,
+     62.5
+    ],
+    [
+     200.62,
+     65.32
+    ],
+    [
+     225.48,
+     68.07
+    ],
+    [
+     250.83,
+     68.06
+    ],
+    [
+     274.25,
+     69.15
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 1299917517,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1301808818+",
+   "from": "n50",
+   "to": "n51",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     354.36,
+     58.6
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 1301808818,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1301808819+",
+   "from": "n41",
+   "to": "n44",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     164.96,
+     -260.17
+    ]
+   ],
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 1301808819,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w1303068639+",
+   "from": "n33",
+   "to": "n32",
+   "lanes": 2,
+   "speedLimitKmh": 80,
+   "points": [
+    [
+     9.79,
+     -48.6
+    ],
+    [
+     5.82,
+     -36.88
+    ],
+    [
+     4.07,
+     -28.06
+    ],
+    [
+     3.78,
+     -23.21
+    ],
+    [
+     4.25,
+     -16.78
+    ],
+    [
+     5.02,
+     -11.16
+    ],
+    [
+     6.85,
+     -4.68
+    ]
+   ],
+   "offset": 0,
+   "name": "Srinagar - Kanyakumari Highway",
+   "osm": {
+    "way": 1303068639,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1314562830+",
+   "from": "n51",
+   "to": "n53",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     430.64,
+     34.36
+    ]
+   ],
+   "offset": 0,
+   "name": "Silkboard Double Decker Flyover",
+   "osm": {
+    "way": 1314562830,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1351994264+",
+   "from": "n23",
+   "to": "n8",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -173.09,
+     -77.32
+    ],
+    [
+     -251.91,
+     -102.36
+    ],
+    [
+     -300.95,
+     -116.83
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "name": "Ragigudda-Silk Board Integrated Flyover (u/c)",
+   "osm": {
+    "way": 1351994264,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1351994265+",
+   "from": "n9",
+   "to": "n7",
+   "lanes": 1,
+   "speedLimitKmh": 50,
+   "points": [
+    [
+     -367.53,
+     -110.16
+    ],
+    [
+     -395.34,
+     -111.56
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1351994265,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1362809475+",
+   "from": "n15",
+   "to": "n14",
+   "lanes": 3,
+   "speedLimitKmh": 50,
+   "offset": 0,
+   "name": "Madiwala Sarjapura Road",
+   "osm": {
+    "way": 1362809475,
+    "highway": "primary"
+   }
+  },
+  {
+   "id": "w1384907601+",
+   "from": "n42",
+   "to": "n53",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     218.5,
+     74.27
+    ],
+    [
+     270.91,
+     76.42
+    ],
+    [
+     313.78,
+     73.83
+    ],
+    [
+     318.99,
+     73.61
+    ],
+    [
+     329.64,
+     72.61
+    ],
+    [
+     395.18,
+     54.97
+    ],
+    [
+     427.94,
+     43.24
+    ],
+    [
+     462.82,
+     30.39
+    ]
+   ],
+   "offset": 0,
+   "name": "Service Road",
+   "osm": {
+    "way": 1384907601,
+    "highway": "trunk_link"
+   }
+  },
+  {
+   "id": "w1411430413+",
+   "from": "n54",
+   "to": "n52",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     545.85,
+     -34.72
+    ],
+    [
+     541.67,
+     -33.35
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 1411430413,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1411430414+",
+   "from": "n55",
+   "to": "n54",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     596.8,
+     -52.51
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 1411430414,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1416769967+",
+   "from": "n44",
+   "to": "n45",
+   "lanes": 3,
+   "speedLimitKmh": 80,
+   "offset": 0,
+   "name": "Hosur Road",
+   "osm": {
+    "way": 1416769967,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1421955575+",
+   "from": "n46",
+   "to": "n57",
+   "lanes": 3,
+   "speedLimitKmh": 60,
+   "points": [
+    [
+     241.08,
+     56.43
+    ],
+    [
+     288.51,
+     56.03
+    ],
+    [
+     318.09,
+     52.58
+    ],
+    [
+     343.04,
+     47.53
+    ],
+    [
+     433.64,
+     22.23
+    ],
+    [
+     607.03,
+     -30.14
+    ],
+    [
+     629.0,
+     -35.52
+    ]
+   ],
+   "offset": 0,
+   "name": "Outer Ring Road",
+   "osm": {
+    "way": 1421955575,
+    "highway": "trunk"
+   }
+  },
+  {
+   "id": "w1422778329+",
+   "from": "n6",
+   "to": "n5",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "offset": 0,
+   "osm": {
+    "way": 1422778329,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1422778330+",
+   "from": "n8",
+   "to": "n6",
+   "lanes": 2,
+   "speedLimitKmh": 40,
+   "points": [
+    [
+     -465.76,
+     -116.53
+    ]
+   ],
+   "layer": 1,
+   "offset": 0,
+   "osm": {
+    "way": 1422778330,
+    "highway": "primary_link"
+   }
+  },
+  {
+   "id": "w1103401541+",
+   "from": "n13",
+   "to": "n24",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     -246.82,
+     -54.85
+    ],
+    [
+     -186.29,
+     -36.43
+    ],
+    [
+     -155.4,
+     -27.04
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 1103401541,
+    "highway": "tertiary"
+   }
+  },
+  {
+   "id": "w1421955576+",
+   "from": "n53",
+   "to": "n58",
+   "lanes": 2,
+   "speedLimitKmh": 30,
+   "points": [
+    [
+     561.14,
+     -4.23
+    ],
+    [
+     605.8,
+     -16.87
+    ],
+    [
+     640.32,
+     -24.09
+    ]
+   ],
+   "offset": 0,
+   "osm": {
+    "way": 1421955576,
+    "highway": "tertiary"
+   }
+  }
+ ],
+ "meta": {
+  "source": {
+   "endpoint": "https://api.openstreetmap.org/api/0.6/map",
+   "bbox": [
+    12.909,
+    77.613,
+    12.9255,
+    77.633
+   ],
+   "filter": "ways with highway in ['motorway', 'motorway_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'trunk', 'trunk_link'], excluding access=no/private",
+   "fetched_utc": "2026-11-13T13:07:09+00:00",
+   "license": "Map data \u00a9 OpenStreetMap contributors, ODbL 1.0 (https://www.openstreetmap.org/copyright)"
+  },
+  "crop": [
+   12.9127,
+   77.6168,
+   12.9217,
+   77.6288
+  ],
+  "projection": {
+   "lat0": 12.9172,
+   "lon0": 77.6228,
+   "kx": 108502.95070051077,
+   "ky": 110540.0
+  },
+  "attribution": "Map data \u00a9 OpenStreetMap contributors, ODbL 1.0",
+  "imputed": {
+   "lanes": 65,
+   "maxspeed": 65
+  },
+  "stats": {
+   "ways excluded by class": 73,
+   "excluded-class chains kept (service roads/connectors)": 4,
+   "bridges flattened (cross no road)": 1,
+   "ways": 163,
+   "not joined: mixed layers": 17,
+   "junction clusters (\u22652 OSM nodes)": 10,
+   "dropped: loop within a junction": 1,
+   "parallel links kept": 8,
+   "cut ends made entry/exit (continued on an excluded road)": 2,
+   "dropped: unreachable or dead-end links": 2,
+   "dropped: links in disconnected pieces": 4,
+   "disconnected pieces dropped": 2,
+   "signal tags ignored (fewer than 2 approaches)": 0,
+   "merged pass-through nodes": 0
+  }
+ }
+}

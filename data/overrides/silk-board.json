@@ -1,0 +1,5 @@
+{
+  "_comment": "Hand fixes applied on top of OSM. 'ways': tag overrides by way id. 'drop_ways': way ids to ignore. Way 1351994264 (Ragigudda-Silk Board flyover ramp) is named '(u/c)' but tagged as an open road (check_date 2024-07-08); kept. Add it to drop_ways to exclude it.",
+  "ways": {},
+  "drop_ways": []
+}

@@ -48,6 +48,12 @@ export interface NodeSpec {
   kind?: NodeKind;
   signal?: SignalPlanSpec;
   name?: string;
+  /**
+   * Relative lane-use weights by movement id ("inLinkId>outLinkId"), used instead of the
+   * default turn weights when distributing an approach's lanes over its movements
+   * (e.g. demand-based lane design, see signalTiming.ts designForDemand).
+   */
+  laneWeights?: Record<string, number>;
 }
 
 export interface LinkSpec {
@@ -64,13 +70,23 @@ export interface LinkSpec {
   points?: [number, number][];
   /** right-of-way rank at priority junctions; default lanes × speed limit */
   priority?: number;
+  /**
+   * lateral shift of the carriageway from the node-to-node line, m (positive = left).
+   * Default: half the carriageway width if the reverse link exists, else 0. Set 0 when
+   * the geometry already is the carriageway centre (e.g. a one-way OSM way).
+   */
+  offset?: number;
   name?: string;
+  /** provenance, e.g. { way: 123, highway: "primary" } for OSM-derived links */
+  osm?: { way: number; highway: string };
 }
 
 export interface NetworkSpec {
   id: string;
   name: string;
   description?: string;
+  /** free-form provenance (source, licence, imputation counts) */
+  meta?: Record<string, unknown>;
   nodes: NodeSpec[];
   links: LinkSpec[];
 }
@@ -286,7 +302,7 @@ export function buildNetwork(spec: NetworkSpec, opts: BuildOptions = {}): Networ
   raw.forEach(({ spec: ls, line }, i) => {
     const link = links[i]!;
     const twoWay = dirLinks.has(pairKey(ls.to, ls.from));
-    link.offset = twoWay ? (ls.lanes * link.laneWidth) / 2 + 0.5 : 0;
+    link.offset = ls.offset ?? (twoWay ? (ls.lanes * link.laneWidth) / 2 + 0.5 : 0);
     let r0 = link.from.radius;
     let r1 = link.to.radius;
     const maxTrim = line.length - 5;
@@ -338,7 +354,7 @@ export function buildNetwork(spec: NetworkSpec, opts: BuildOptions = {}): Networ
       }
       // Leftmost movement first → kerb lanes.
       cands.sort((a, b) => b.angle - a.angle);
-      assignLanes(inL.spec.lanes, cands);
+      assignLanes(inL.spec.lanes, cands, n.spec.laneWeights);
       nodeMoves.push(...cands);
     }
     const throughRange = throughOutRanges(nodeMoves);
@@ -459,11 +475,12 @@ function throughOutRanges(ms: MovementRT[]): Map<MovementRT, [number, number]> {
  * Distribute n lanes over movements ordered left→right, proportionally to
  * TURN_WEIGHT. Neighbouring movements may share a lane; every movement gets ≥ 1.
  */
-function assignLanes(n: number, ms: MovementRT[]): void {
-  const total = ms.reduce((s, m) => s + TURN_WEIGHT[m.turn], 0);
+function assignLanes(n: number, ms: MovementRT[], weights?: Record<string, number>): void {
+  const weightOf = (m: MovementRT) => weights?.[m.id] ?? TURN_WEIGHT[m.turn];
+  const total = ms.reduce((s, m) => s + weightOf(m), 0);
   let acc = 0;
   for (const m of ms) {
-    const w = TURN_WEIGHT[m.turn];
+    const w = weightOf(m);
     const lo = Math.min(n - 1, Math.floor((acc * n) / total + 1e-9));
     const hi = Math.max(lo, Math.min(n - 1, Math.ceil(((acc + w) * n) / total - 1e-9) - 1));
     for (let i = lo; i <= hi; i++) m.inLanes.push(i);
