@@ -1,0 +1,11 @@
+{
+  "name": "quest-traffic-sim",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": ["engine", "server", "web"],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev -w web"
+  }
+}
