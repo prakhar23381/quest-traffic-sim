@@ -232,8 +232,8 @@ compare mode, deployed and validated.
 
 | Phase | Status | Commit | Notes |
 |---|---|---|---|
-| 0 Setup | ☐ | | |
-| 1 Engine core | ☐ | | |
+| 0 Setup | ✅ | c7ad3f4 | Repo: github.com/prakhar23381/quest-traffic-sim |
+| 1 Engine core | ✅ | (this commit) | 26 tests green. Capacity 2,012 veh/h/lane. Fixed an entrance-capacity bug (1,187 → 2,009 veh/h); see docs/VALIDATION.md §3. Deviation: vehicles are plain objects, not structure-of-arrays (simpler); revisit only if the Phase 5 FPS target fails. |
 | 2 Network | ☐ | | |
 | 3 OSM data | ☐ | | |
 | 4 Backend | ☐ | | |
