@@ -17,6 +17,10 @@ and capacities, deployed as a web app where users set up scenarios and compare r
   Silk Board Flyover and the double-decker flyover ramps ([data/README.md](data/README.md)).
   Its traffic demand is **synthetic**, not calibrated against counts.
 
+- **API server** (`server/`): Fastify + SQLite. Stores scenarios, runs them in worker threads
+  (queue, concurrency cap, time limit, rate limits) and returns the same results the browser
+  computes. Endpoints are listed at the top of [server/src/app.ts](server/src/app.ts).
+
 ## Layout
 - `engine/` — simulation core (TypeScript, runs in browser Web Worker and in Node)
 - `server/` — Fastify API + SQLite
@@ -28,8 +32,9 @@ and capacities, deployed as a web app where users set up scenarios and compare r
 ## Develop
 ```bash
 npm install
-npm test
-npm run dev
+npm test                      # engine + server tests
+npm run dev -w @traffic/server  # API on http://localhost:8080
+npm run dev                   # web app
 ```
 
 ## Data and licence

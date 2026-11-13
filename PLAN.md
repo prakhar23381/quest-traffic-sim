@@ -236,7 +236,7 @@ compare mode, deployed and validated.
 | 1 Engine core | ✅ | dd4d2d7 | 25 tests green. Capacity 2,012 veh/h/lane. Fixed an entrance-capacity bug (1,187 → 2,009 veh/h); see docs/VALIDATION.md §3. Deviation: vehicles are plain objects, not structure-of-arrays (simpler); revisit only if the Phase 5 FPS target fails. |
 | 2 Network | ✅ | (this commit) | 63 tests green. Multi-lane links, lane changing, signalised and priority junctions, flyovers, zipper merging, reactive routing, 5 presets. Validated against Webster (signal delay), HCM (saturation flow, gap acceptance) and Braess. A hardest-braking metric exposed several lane-change and stop-line collision bugs that the collision check had missed; all fixed (docs/VALIDATION.md §8). Known limitations listed there. |
 | 3 OSM data | ✅ | (this commit) | Silk Board from OSM (main API; Overpass unreachable). Default demand 120 veh/h/entry lane: ~95 % of trips done in 1 h, no gridlock, 5 seeds; 2× overloads. Real geometry exposed ~20 engine and data bugs, all fixed and listed in docs/VALIDATION.md §8. Scope decision: tertiary streets left out except service-road chains. Finding: with the flyover closed, southbound through traffic has no ground route in OSM. |
-| 4 Backend | ☐ | | |
+| 4 Backend | ✅ | (this commit) | Scenario format, validation and edits live in the engine (`scenario.ts`, `catalog.ts`, `results.ts`), so browser and server share them. Fastify + better-sqlite3, worker-thread runs with queue/concurrency/timeout/rate limits. 9 API tests incl. bit-identical browser/server parity; 17 scenario tests. Built bundle smoke-tested over HTTP (Silk Board 10 min in 0.4 s). |
 | 5 Frontend | ☐ | | |
 | 6 Deploy | ☐ | | |
 | 7 Hardening | ☐ | | |
