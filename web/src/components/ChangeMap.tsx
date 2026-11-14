@@ -52,7 +52,7 @@ export function ChangeMap({ a, b }: { a: RunResult; b: RunResult }) {
         ariaLabel="Map of the change in mean speed on each road, baseline to alternative"
       >
         <div className="map-legend">
-          <b>Mean speed on each road, alternative vs baseline</b>
+          <b data-tip="Change in mean speed on each road, from the baseline run to the alternative">Speed change</b>
           <div>
             {LABELS.map((l, i) => (
               <span key={l}>

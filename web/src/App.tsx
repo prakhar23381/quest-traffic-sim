@@ -6,11 +6,13 @@ import { Editor } from "./components/Editor";
 import { MapView } from "./components/MapView";
 import { Results, type RunRecord } from "./components/Results";
 import { SpeedLegend } from "./components/SpeedLegend";
+import { Info, TooltipLayer } from "./components/Tooltip";
 import { clock, int, num } from "./lib/format";
 import { layerName, linkLabel } from "./lib/labels";
 import { RunError, startRun, type RunHandle, type RunMode, type RunSource } from "./lib/runs";
 import { loadStoredScenario, saveScenario, scenarioFromHash, scenarioHash } from "./lib/share";
 import { useLiveSim } from "./lib/useLiveSim";
+import { setTheme, useTheme } from "./lib/useDarkMode";
 
 type Tab = "live" | "results" | "compare" | "about";
 const SPEEDS = [1, 4, 8, 20, 60, 0];
@@ -45,6 +47,7 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [runMode, setRunMode] = useState<RunMode>("auto");
   const runKey = useRef(1);
+  const theme = useTheme();
   const [linkError, setLinkError] = useState<string | null>(() =>
     /[#&]s=/.test(location.hash) && !scenarioFromHash(location.hash) ? "This link's scenario could not be read (it may be damaged or from another version), so the default scenario is shown." : null,
   );
@@ -123,8 +126,11 @@ export default function App() {
     <div className="app">
       <header className="top">
         <div className="brand">
-          <h1>Junction Lab</h1>
-          <span>agent-based traffic simulation</span>
+          <img src="/favicon.svg" alt="" />
+          <div>
+            <h1>Junction Lab</h1>
+            <span>traffic simulator</span>
+          </div>
         </div>
         <nav className="tabs" role="tablist">
           {tabs.map(([id, label]) => (
@@ -139,11 +145,20 @@ export default function App() {
               {shareMsg}
             </span>
           )}
-          <button type="button" onClick={share}>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+            data-tip={theme === "dark" ? "Light theme" : "Dark theme"}
+          >
+            {theme === "dark" ? "☀" : "☾"}
+          </button>
+          <button type="button" onClick={share} data-tip="Copy a link that opens this exact scenario">
             Share
           </button>
           <button type="button" className="mobile-only" onClick={() => setPanelOpen((o) => !o)} aria-expanded={panelOpen}>
-            {panelOpen ? "Close editor" : "Edit scenario"}
+            {panelOpen ? "Done" : "Edit"}
           </button>
         </div>
       </header>
@@ -179,8 +194,14 @@ export default function App() {
               </button>
             </div>
           ) : (
-            <button type="button" className="primary" disabled={!prepared.ok} onClick={run}>
-              Run full simulation ({clock(scenario.durationS)})
+            <button
+              type="button"
+              className="primary"
+              disabled={!prepared.ok}
+              onClick={run}
+              data-tip="Simulate the whole period without drawing, then show the results. Each run is kept for comparison."
+            >
+              Run simulation <small>· {clock(scenario.durationS)}</small>
             </button>
           )}
           {runError && (
@@ -189,14 +210,17 @@ export default function App() {
             </p>
           )}
           <label className="field run-where">
-            <span>Run on</span>
+            <span>
+              <span>
+                Run on <Info tip="Auto uses the server when it would finish in about 12 s, otherwise your browser. Both give identical results." />
+              </span>
+            </span>
             <select value={runMode} onChange={(e) => setRunMode(e.target.value as RunMode)} disabled={!!active}>
               <option value="auto">Auto (fastest)</option>
               <option value="browser">This browser</option>
               <option value="server">The server</option>
             </select>
           </label>
-          <p className="hint">Runs the whole period without drawing and adds it to Results, where you can compare it with other runs. Auto uses the server when it would be quick, otherwise your browser; both give identical results.</p>
         </div>
       </aside>
 
@@ -221,21 +245,21 @@ export default function App() {
             <div className="hud">
               <div className="controls">
                 {live.playing ? (
-                  <button type="button" className="primary" onClick={live.pause}>
+                  <button type="button" onClick={live.pause} data-tip="Pause the live view">
                     Pause
                   </button>
                 ) : (
-                  <button type="button" className="primary" onClick={live.play} disabled={!prepared.ok || (st !== null && st.t >= st.durationS)}>
+                  <button type="button" onClick={live.play} data-tip="Watch the traffic move" disabled={!prepared.ok || (st !== null && st.t >= st.durationS)}>
                     Play
                   </button>
                 )}
-                <button type="button" onClick={() => live.step(10)} disabled={live.playing || !prepared.ok} title="Advance 10 simulated seconds">
+                <button type="button" onClick={() => live.step(10)} disabled={live.playing || !prepared.ok} data-tip="Step forward 10 simulated seconds">
                   +10 s
                 </button>
-                <button type="button" onClick={live.restart} disabled={!prepared.ok}>
+                <button type="button" onClick={live.restart} disabled={!prepared.ok} data-tip="Start again from 0:00">
                   Restart
                 </button>
-                <label className="speed">
+                <label className="speed" data-tip="Simulated seconds per real second">
                   <span>Speed</span>
                   <select value={live.speed} onChange={(e) => live.setSpeed(Number(e.target.value))}>
                     {SPEEDS.map((x) => (
@@ -248,34 +272,32 @@ export default function App() {
               </div>
               {st && (
                 <dl className="hud-stats">
+                  <span className={`badge ${live.playing ? "live" : ""}`} role="status">
+                    <i className="live-dot" aria-hidden="true" />
+                    {live.playing ? `Live · ${num(st.rate, 0)}×` : st.t >= st.durationS ? "Finished" : "Paused"}
+                  </span>
                   <div>
-                    <dt>Time</dt>
+                    <dt data-tip="Simulated time / length of the run">Time</dt>
                     <dd>
                       {clock(st.t)} <small>/ {clock(st.durationS)}</small>
                     </dd>
                   </div>
                   <div>
-                    <dt>On the roads</dt>
+                    <dt data-tip="Vehicles on the network right now">On roads</dt>
                     <dd>{int(st.inNetwork)}</dd>
                   </div>
                   <div>
-                    <dt>Waiting to enter</dt>
+                    <dt data-tip="Vehicles queued at the edge of the network, unable to enter yet">Waiting</dt>
                     <dd>{int(st.waiting)}</dd>
                   </div>
                   <div>
-                    <dt>Trips done</dt>
+                    <dt data-tip="Vehicles that reached their destination">Done</dt>
                     <dd>{int(st.completed)}</dd>
                   </div>
                   <div>
-                    <dt>Mean speed</dt>
+                    <dt data-tip="Average speed of the vehicles on the roads right now">Speed</dt>
                     <dd>{num(st.meanSpeedKmh, 0)} km/h</dd>
                   </div>
-                  {live.playing && (
-                    <div>
-                      <dt>Sim rate</dt>
-                      <dd>{num(st.rate, 0)}×</dd>
-                    </div>
-                  )}
                 </dl>
               )}
             </div>
@@ -308,13 +330,14 @@ export default function App() {
             </div>
           ) : (
             <div className="empty">
-              <h2>No runs yet</h2>
-              <p>Set up a scenario on the left and press "Run full simulation". The result (travel times, queues, speed on every road) appears here.</p>
+              <h2 className="display">No runs yet</h2>
+              <p>Set up a scenario on the left, then press Run simulation.</p>
             </div>
           ))}
         {tab === "compare" && <Compare runs={runs} a={pair.a} b={pair.b} onPick={(w, k) => setPair((p) => ({ ...p, [w]: k }))} />}
         {tab === "about" && <About />}
       </main>
+      <TooltipLayer />
     </div>
   );
 }

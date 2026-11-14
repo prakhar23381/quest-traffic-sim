@@ -11,3 +11,4 @@ __pycache__/
 coverage/
 *.db-shm
 *.db-wal
+.superdesign/

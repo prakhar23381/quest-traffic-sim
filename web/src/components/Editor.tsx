@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { CATALOG, LIMITS, defaultScenario, type CatalogEntry, type Network, type Scenario } from "@traffic/engine";
 import { int, num } from "../lib/format";
 import { CrossSection } from "./CrossSection";
+import { Info } from "./Tooltip";
 import { layerName, linkLabel, nodeLabel, phaseLabel } from "../lib/labels";
 
 interface Props {
@@ -58,7 +59,16 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
       <section>
         <h2>Network</h2>
         <label className="field">
-          <span>Road network</span>
+          <span>
+            <span>
+              Road network <Info tip={entry.description} />
+            </span>
+            {entry.osm && (
+              <span className="badge small" data-tip="Roads, lanes and flyovers built from OpenStreetMap (© OpenStreetMap contributors, ODbL)">
+                OSM
+              </span>
+            )}
+          </span>
           <select
             value={s.networkId}
             onChange={(e) => {
@@ -73,7 +83,6 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
             ))}
           </select>
         </label>
-        <p className="hint">{entry.description}</p>
       </section>
 
       {entry.toggles.length > 0 && (
@@ -85,8 +94,7 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
               <label key={t.id} className="switch">
                 <input type="checkbox" checked={on} onChange={() => set({ togglesOff: on ? [...s.togglesOff, t.id] : s.togglesOff.filter((x) => x !== t.id) })} />
                 <span>
-                  <b>{t.label}</b> {on ? "open" : "closed"}
-                  {t.description && <small>{t.description}</small>}
+                  <b>{t.label}</b> {on ? "open" : "closed"} {t.description && <Info tip={t.description} />}
                 </span>
               </label>
             );
@@ -98,13 +106,22 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
         <h2>Traffic demand</h2>
         <label className="field">
           <span>
-            Demand <output>{num(s.demandScale, 2)}× · {int(baseVph * s.demandScale)} veh/h</output>
+            <span>
+              Demand <Info tip="Trips per hour entering the network, as a multiple of the default (synthetic, not measured) demand." />
+            </span>
+            <output>
+              {num(s.demandScale, 2)}× · {int(baseVph * s.demandScale)} veh/h
+            </output>
           </span>
           <input type="range" min={0} max={LIMITS.maxDemandScale} step={0.05} value={s.demandScale} onChange={(e) => set({ demandScale: Number(e.target.value) })} />
         </label>
         <div className="row">
           <label className="field">
-            <span>Duration</span>
+            <span>
+              <span>
+                Duration <Info tip="Simulated time for a full run. The live view plays the same period." />
+              </span>
+            </span>
             <select value={s.durationS} onChange={(e) => set({ durationS: Number(e.target.value) })}>
               {[...new Set([...DURATIONS, s.durationS])].sort((a, b) => a - b).map((d) => (
                 <option key={d} value={d}>
@@ -114,27 +131,30 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
             </select>
           </label>
           <label className="field">
-            <span>Random seed</span>
+            <span>
+              <span>
+                Seed <Info tip="Trips arrive at random. The same seed repeats a run exactly; change it to check a result is not luck." />
+              </span>
+            </span>
             <input type="number" min={0} step={1} value={s.seed} onChange={(e) => set({ seed: Math.max(0, Math.floor(Number(e.target.value) || 0)) })} />
           </label>
         </div>
-        <p className="hint">Trips are random (Poisson arrivals); the seed makes a run repeatable.</p>
       </section>
 
       <section ref={roadRef}>
         <h2>Selected road</h2>
         {!link || !baseLink ? (
-          <p className="hint">Click a road on the map to change its lanes, speed limit or lane width, or to close it.</p>
+          <p className="hint">Click a road on the map to edit it.</p>
         ) : (
           <div className="road">
             <div className="road-head">
-              <b>{linkLabel(link)}</b>
-              <button type="button" className="link" onClick={() => onSelect(null)} aria-label="Deselect road">
+              <b data-tip={`Road id ${link.id}`}>{linkLabel(link)}</b>
+              <button type="button" className="link" onClick={() => onSelect(null)} aria-label="Deselect road" data-tip="Deselect">
                 ✕
               </button>
             </div>
             <p className="hint">
-              {layerName(link.layer)} · {int(link.length)} m · id {link.id}
+              {layerName(link.layer)} · {int(link.length)} m
             </p>
             <CrossSection
               lanes={s.linkEdits[link.id]?.lanes ?? baseLink.lanes}
@@ -146,13 +166,13 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
             />
             <div className="row">
               <label className="field">
-                <span>Speed limit, km/h</span>
+                <span>Speed limit (km/h)</span>
                 <input type="number" min={10} max={120} step={5} value={s.linkEdits[link.id]?.speedLimitKmh ?? baseLink.speedLimitKmh} onChange={(e) => editLink(link.id, { speedLimitKmh: Math.min(120, Math.max(10, Number(e.target.value) || 10)) })} />
               </label>
               <label className="switch road-open">
                 <input type="checkbox" checked={!closed.has(link.id)} onChange={() => toggleClosed(link.id)} />
                 <span>
-                  <b>Road</b> {closed.has(link.id) ? "closed" : "open"}
+                  <b>{closed.has(link.id) ? "Closed" : "Open"}</b> <Info tip="A closed road takes no traffic; trips are rerouted, or reported as having no route." />
                 </span>
               </label>
             </div>
@@ -166,7 +186,7 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
               const what = [closed.has(id) && "closed", e?.lanes && `${e.lanes} lanes`, e?.speedLimitKmh && `${e.speedLimitKmh} km/h`, e?.laneWidth && `${e.laneWidth} m lanes`].filter(Boolean).join(", ");
               return (
                 <li key={id}>
-                  <button type="button" className="link" onClick={() => onSelect(id)}>
+                  <button type="button" className="link" onClick={() => onSelect(id)} data-tip="Show this road">
                     {l ? linkLabel(l) : id}
                   </button>
                   <span>{what}</span>
@@ -174,6 +194,7 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
                     type="button"
                     className="link"
                     aria-label={`Undo changes to ${l ? linkLabel(l) : id}`}
+                    data-tip="Undo changes to this road"
                     onClick={() => {
                       const linkEdits = { ...s.linkEdits };
                       delete linkEdits[id];
@@ -198,8 +219,7 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
             <label className="switch">
               <input type="checkbox" checked={s.retimeSignals} onChange={() => set({ retimeSignals: !s.retimeSignals })} />
               <span>
-                <b>Retime for this demand</b>
-                <small>Webster's method on the busiest lane of each phase, recomputed for the demand above.</small>
+                <b>Auto-time for this demand</b> <Info tip="Recompute every signal's cycle and green times for the demand above (Webster's method, busiest lane of each phase)." />
               </span>
             </label>
             {signals.map((n) => {
@@ -207,12 +227,12 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
               return (
                 <details key={n.id} className="signal" open={signals.length <= 2}>
                   <summary>
-                    {nodeLabel(n)} <small>cycle {Math.round(sig.cycle)} s</small>
+                    {nodeLabel(n)} <small data-tip="Time for all phases to come round once, including amber and all-red">cycle {Math.round(sig.cycle)} s</small>
                   </summary>
                   {sig.phases.map((p, i) => (
                     <label key={i} className="phase">
-                      <span title={phaseLabel(net, p.movements)}>
-                        Phase {i + 1}: <small>{phaseLabel(net, p.movements)}</small>
+                      <span data-tip={`Phase ${i + 1} gives green to: ${phaseLabel(net, p.movements)}`}>
+                        Phase {i + 1} <small>green</small>
                       </span>
                       <input
                         type="number"
@@ -228,7 +248,7 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
                   ))}
                   {s.signalGreens[n.id] && !s.retimeSignals && (
                     <button type="button" className="link" onClick={() => resetGreens(n.id)}>
-                      Reset to the original plan
+                      Reset timings
                     </button>
                   )}
                 </details>

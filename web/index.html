@@ -1,11 +1,21 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Junction Lab</title>
     <meta name="description" content="Agent-based traffic simulation of junctions and flyovers, including Silk Board junction in Bengaluru." />
+    <meta name="theme-color" content="#000000" />
+    <script>
+      // apply a saved light/dark choice before first paint (dark is the default)
+      try {
+        if (localStorage.getItem("junction-lab-theme") === "light") document.documentElement.dataset.theme = "light";
+      } catch (e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="root"></div>

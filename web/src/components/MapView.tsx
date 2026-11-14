@@ -218,11 +218,11 @@ export function MapView({ net, closed, frameRef, time = 0, heat, selected, onSel
         </div>
       )}
       <div className="map-zoom">
-        <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1.4)} aria-label="Zoom in">+</button>
-        <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1 / 1.4)} aria-label="Zoom out">−</button>
-        <button type="button" onClick={fit} aria-label="Fit network to view" title="Fit">⤢</button>
+        <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1.4)} aria-label="Zoom in" data-tip="Zoom in">+</button>
+        <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1 / 1.4)} aria-label="Zoom out" data-tip="Zoom out">−</button>
+        <button type="button" onClick={fit} aria-label="Fit network to view" data-tip="Fit the network">⤢</button>
         {basemap && (
-          <button type="button" className={showMap ? "on" : ""} onClick={() => setShowMap((v) => !v)} aria-pressed={showMap} title="Street map underneath">
+          <button type="button" className={showMap ? "on" : ""} onClick={() => setShowMap((v) => !v)} aria-pressed={showMap} data-tip={showMap ? "Hide the street map" : "Show the street map"}>
             Map
           </button>
         )}

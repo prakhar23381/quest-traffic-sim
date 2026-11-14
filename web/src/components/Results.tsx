@@ -7,6 +7,7 @@ import { useDarkMode } from "../lib/useDarkMode";
 import { LineChart } from "./LineChart";
 import { MapView } from "./MapView";
 import { SpeedLegend } from "./SpeedLegend";
+import { Info } from "./Tooltip";
 
 export interface RunRecord {
   key: number;
@@ -19,19 +20,29 @@ export interface RunRecord {
 
 export const SERIES = ["var(--series-1)", "var(--series-2)"];
 
+/** Headline measures. `value` is the full text (tables); `big` + `unit` are for tiles. */
 export function kpiRows(r: RunResult) {
   const k = r.kpis;
+  const row = (label: string, big: string, unit: string, raw: number, better: "up" | "down" | null, hint: string) => ({
+    label,
+    big,
+    unit,
+    value: unit ? `${big} ${unit}` : big,
+    raw,
+    better,
+    hint,
+  });
   return [
-    { label: "Trips completed", value: int(k.completed), raw: k.completed, better: "up" as const, hint: `of ${int(k.entered)} that entered` },
-    { label: "Throughput", value: `${int(k.throughputVph)} veh/h`, raw: k.throughputVph, better: "up" as const },
-    { label: "Mean travel time", value: clock(k.meanTravelTime), raw: k.meanTravelTime, better: "down" as const, hint: "completed trips, incl. waiting to enter" },
-    { label: "90th percentile travel time", value: clock(k.p90TravelTime), raw: k.p90TravelTime, better: "down" as const },
-    { label: "Mean delay", value: clock(k.meanDelay), raw: k.meanDelay, better: "down" as const, hint: "vs free-flow travel time" },
-    { label: "Mean speed", value: `${num(k.meanSpeedKmh)} km/h`, raw: k.meanSpeedKmh, better: "up" as const },
-    { label: "Still waiting to enter", value: int(k.waiting), raw: k.waiting, better: "down" as const, hint: "queued at the network edge at the end" },
-    { label: "Trips with no route", value: int(k.unserved), raw: k.unserved, better: "down" as const, hint: "destination unreachable (closures)" },
-    { label: "Vehicle-km travelled", value: int(k.vkt), raw: k.vkt, better: null },
-    { label: "Removed (gridlock / wrong lane)", value: `${int(k.droppedGridlock)} / ${int(k.droppedWrongLane)}`, raw: k.droppedGridlock + k.droppedWrongLane, better: "down" as const, hint: "safety valves; should be near zero" },
+    row("Trips done", int(k.completed), "", k.completed, "up", `Vehicles that reached their destination, of ${int(k.entered)} that entered.`),
+    row("Throughput", int(k.throughputVph), "veh/h", k.throughputVph, "up", "Completed trips per hour."),
+    row("Travel time", clock(k.meanTravelTime), "avg", k.meanTravelTime, "down", "Mean door-to-door time of completed trips, including waiting to enter."),
+    row("Slowest 10%", clock(k.p90TravelTime), "", k.p90TravelTime, "down", "90th percentile travel time: 1 trip in 10 took at least this long."),
+    row("Delay", clock(k.meanDelay), "avg", k.meanDelay, "down", "Mean extra time compared with driving the same route on empty roads."),
+    row("Speed", num(k.meanSpeedKmh), "km/h", k.meanSpeedKmh, "up", "Mean speed of all vehicles over the run."),
+    row("Waiting", int(k.waiting), "", k.waiting, "down", "Vehicles still queued at the edge of the network when the run ended."),
+    row("No route", int(k.unserved), "", k.unserved, "down", "Trips that could not start because closures left no way to their destination."),
+    row("Distance", int(k.vkt), "veh-km", k.vkt, null, "Total vehicle-kilometres driven."),
+    row("Removed", int(k.droppedGridlock + k.droppedWrongLane), "", k.droppedGridlock + k.droppedWrongLane, "down", `Safety valves, should be near zero: ${int(k.droppedGridlock)} removed after 5 min stuck in gridlock, ${int(k.droppedWrongLane)} stuck in a lane that could not make their turn.`),
   ];
 }
 
@@ -59,25 +70,41 @@ export function Results({ run }: { run: RunRecord }) {
     <div className="results">
       <div className="results-main">
         <header className="results-head">
-          <h2>{run.label}</h2>
+          <h2 className="display">{run.label}</h2>
           <p className="hint">
-            {r.networkName} · {clock(r.durationS)} simulated in {num(r.wallMs / 1000, 1)} s ({run.source === "server" ? "on the server" : "in your browser"}{run.note ? `: ${run.note}` : ""})
+            <span className="badge" data-tip={`${r.networkName}${run.note ? ` · ${run.note}` : ""}`}>
+              {run.source === "server" ? "Server" : "Browser"}
+            </span>
+            <span>
+              {clock(r.durationS)} simulated in {num(r.wallMs / 1000, 1)} s
+            </span>
           </p>
         </header>
         <dl className="kpis">
           {kpiRows(r).map((k) => (
-            <div key={k.label} title={k.hint}>
-              <dt>{k.label}</dt>
-              <dd>{k.value}</dd>
+            <div key={k.label}>
+              <dt>
+                {k.label} <Info tip={k.hint} />
+              </dt>
+              <dd>
+                {k.big} {k.unit && <small>{k.unit}</small>}
+              </dd>
             </div>
           ))}
         </dl>
         {(r.kpis.gridlockAt !== null || r.warnings.length > 0) && (
           <div className="notice">
-            {r.kpis.gridlockAt !== null && <p>Part of the network locked up at {clock(r.kpis.gridlockAt)} (20+ vehicles stopped for over a minute).</p>}
-            {r.warnings.slice(0, 4).map((w) => (
-              <p key={w}>{w}</p>
-            ))}
+            {r.kpis.gridlockAt !== null && (
+              <p>
+                Gridlock from {clock(r.kpis.gridlockAt)} <Info tip="20 or more vehicles stopped for over a minute somewhere in the network." />
+              </p>
+            )}
+            {r.warnings.length > 0 && (
+              <p>
+                {r.warnings.length === 1 ? r.warnings[0] : `${r.warnings.length} warnings`}{" "}
+                {r.warnings.length > 1 && <Info tip={r.warnings.slice(0, 12).join(" · ") + (r.warnings.length > 12 ? " …" : "")} />}
+              </p>
+            )}
           </div>
         )}
         <div className="charts">
@@ -86,7 +113,9 @@ export function Results({ run }: { run: RunRecord }) {
           <LineChart title="Mean speed in the network, km/h" series={[{ label: "Speed", color: SERIES[0]!, points: ts.map((s) => [s.t, s.meanSpeed * 3.6]) }]} fmt={(x) => num(x, 0)} fmtX={clock} />
           <LineChart title="Trips completed per hour" series={[{ label: "Throughput", color: SERIES[0]!, points: ts.map((s) => [s.t, s.throughput]) }]} fmt={int} fmtX={clock} minStep={1} />
         </div>
-        <h3>Longest queues</h3>
+        <h3>
+          Longest queues <Info tip="Roads where the most vehicles were crawling (under 7 km/h) at once. Click a row to find it on the map." />
+        </h3>
         <div className="table-wrap">
           <table>
             <thead>
@@ -94,9 +123,9 @@ export function Results({ run }: { run: RunRecord }) {
                 <th>Road</th>
                 <th>Level</th>
                 <th className="num">Lanes</th>
-                <th className="num">Vehicles</th>
+                <th className="num" data-tip="Vehicles that used this road">Vehicles</th>
                 <th className="num">Mean speed</th>
-                <th className="num">Max queue</th>
+                <th className="num" data-tip="Most vehicles crawling on this road at any moment">Max queue</th>
               </tr>
             </thead>
             <tbody>

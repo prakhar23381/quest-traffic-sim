@@ -3,6 +3,7 @@ import { clock, int, num } from "../lib/format";
 import { kpiRows, SERIES, type RunRecord } from "./Results";
 import { LineChart } from "./LineChart";
 import { ChangeMap } from "./ChangeMap";
+import { Info } from "./Tooltip";
 
 interface Props {
   runs: RunRecord[];
@@ -54,11 +55,8 @@ export function Compare({ runs, a, b, onPick }: Props) {
   if (runs.length < 2)
     return (
       <div className="empty">
-        <h2>Compare two scenarios</h2>
-        <p>
-          Run at least two scenarios first. A typical study: run the baseline, change one thing (close the flyover, add a lane, raise demand), run again,
-          then compare them here.
-        </p>
+        <h2 className="display">Compare two scenarios</h2>
+        <p>Run a baseline, change one thing (close the flyover, add a lane, raise demand), run again.</p>
       </div>
     );
 
@@ -74,7 +72,9 @@ export function Compare({ runs, a, b, onPick }: Props) {
       </div>
       {both && (
         <>
-          <p className="hint">Changes from baseline to alternative: {differences(A, B).join(" · ")}</p>
+          <p className="hint">
+            <span className="badge">What changed</span> {differences(A, B).join(" · ")}
+          </p>
           <div className="table-wrap">
             <table>
               <thead>
@@ -82,7 +82,9 @@ export function Compare({ runs, a, b, onPick }: Props) {
                   <th>Measure</th>
                   <th className="num">Baseline</th>
                   <th className="num">Alternative</th>
-                  <th className="num">Change</th>
+                  <th className="num">
+                    Change <Info tip="▲ better, ▼ worse. Each run uses one random seed, so differences of a few percent can be noise: try another seed before concluding." />
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -93,7 +95,9 @@ export function Compare({ runs, a, b, onPick }: Props) {
                   const good = ra.better && Math.abs(d) > 1e-9 ? (ra.better === "up" ? d > 0 : d < 0) : null;
                   return (
                     <tr key={ra.label}>
-                      <td title={ra.hint}>{ra.label}</td>
+                      <td>
+                        {ra.label} <Info tip={ra.hint} />
+                      </td>
                       <td className="num">{ra.value}</td>
                       <td className="num">{rb.value}</td>
                       <td className={`num ${good === null ? "" : good ? "good" : "bad"}`}>
@@ -107,7 +111,6 @@ export function Compare({ runs, a, b, onPick }: Props) {
               </tbody>
             </table>
           </div>
-          <p className="hint">▲ better, ▼ worse. One seed per run: differences of a few percent can be noise, so try another seed before concluding.</p>
           {A.result.scenario.networkId === B.result.scenario.networkId && (
             <>
               <h3>Where it changed</h3>

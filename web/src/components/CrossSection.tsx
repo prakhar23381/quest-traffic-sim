@@ -1,5 +1,6 @@
 import { CITY_IDM, LIMITS, laneWidthFactor } from "@traffic/engine";
 import { num } from "../lib/format";
+import { Info } from "./Tooltip";
 
 interface Props {
   lanes: number;
@@ -66,24 +67,26 @@ export function CrossSection({ lanes, laneWidth, layer, closed, onLanes, onWidth
       <div className="xsec-controls">
         <div className="stepper" role="group" aria-label="Lanes">
           <span>Lanes</span>
-          <button type="button" onClick={() => onLanes(lanes - 1)} disabled={lanes <= 1} aria-label="Remove a lane">
+          <button type="button" onClick={() => onLanes(lanes - 1)} disabled={lanes <= 1} aria-label="Remove a lane" data-tip="Remove a lane">
             −
           </button>
           <b>{lanes}</b>
-          <button type="button" onClick={() => onLanes(lanes + 1)} disabled={lanes >= LIMITS.maxLanes} aria-label="Add a lane">
+          <button type="button" onClick={() => onLanes(lanes + 1)} disabled={lanes >= LIMITS.maxLanes} aria-label="Add a lane" data-tip="Add a lane">
             +
           </button>
         </div>
         <label className="field">
           <span>
-            Lane width <output>{laneWidth} m</output>
+            <span>
+              Lane width <Info tip="Narrow lanes are driven more cautiously: slower and with longer gaps (70% of the speed limit at 2.5 m, full speed from 3.5 m)." />
+            </span>
+            <output>{laneWidth} m</output>
           </span>
           <input type="range" min={2.5} max={4} step={0.25} value={laneWidth} onChange={(e) => onWidth(Number(e.target.value))} />
         </label>
       </div>
-      <p className="hint">
-        Drivers here aim for {Math.round(f * 100)}% of the speed limit and keep a {num(gap, 1)} s gap
-        {f < 1 ? " (narrow lanes are driven more cautiously)" : ""}. A car is 1.8 m wide, drawn to scale.
+      <p className="hint" data-tip="What drivers on this road aim for, from the lane width. Drawn to scale: each car is 1.8 m wide.">
+        Drivers: {Math.round(f * 100)}% of limit · {num(gap, 1)} s gap
       </p>
     </div>
   );

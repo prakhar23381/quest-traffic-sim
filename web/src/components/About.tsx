@@ -3,7 +3,7 @@ const REPO = "https://github.com/prakhar23381/quest-traffic-sim";
 export function About() {
   return (
     <article className="about">
-      <h2>About the model</h2>
+      <h2 className="display">About the model</h2>
       <p>
         Every vehicle is simulated individually (an <em>agent</em>), four times per simulated second. The same TypeScript engine runs in your browser for the live view
         and on the server for full runs, and both give bit-identical results.

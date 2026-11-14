@@ -9,7 +9,7 @@ export function SpeedLegend({ title }: { title: string }) {
   });
   return (
     <div className="map-legend">
-      <b>{title}</b>
+      <b data-tip="Colours show how fast vehicles are moving; flyover decks are drawn above the roads they cross">{title}</b>
       <div>
         {labels.map((l, i) => (
           <span key={l}>

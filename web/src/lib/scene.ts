@@ -129,20 +129,20 @@ export const LIGHT: Palette = {
   shadow: "rgba(15,23,42,0.28)",
   // neutral, so a closed road is never confused with a red "slow" or "slower" colour
   closed: "#3f3f46",
-  select: "#2563eb",
+  select: "#6b55c4",
   speeds: ["#dc2626", "#f97316", "#eab308", "#65a30d", "#15803d"],
 };
 
 export const DARK: Palette = {
-  ground: "#14171c",
-  road: "#343a44",
-  deck: "#58616f",
-  junction: "#3b424c",
-  marking: "rgba(226,232,240,0.45)",
-  edge: "rgba(226,232,240,0.25)",
+  ground: "#050607",
+  road: "#2a2d33",
+  deck: "#474c55",
+  junction: "#30343a",
+  marking: "rgba(232,234,238,0.4)",
+  edge: "rgba(232,234,238,0.22)",
   shadow: "rgba(0,0,0,0.55)",
   closed: "#c4c4cc",
-  select: "#60a5fa",
+  select: "#9984d8",
   speeds: ["#ef4444", "#fb923c", "#facc15", "#a3e635", "#4ade80"],
 };
 
