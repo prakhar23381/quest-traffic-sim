@@ -9,3 +9,5 @@ data/.venv/
 __pycache__/
 *.tsbuildinfo
 coverage/
+*.db-shm
+*.db-wal

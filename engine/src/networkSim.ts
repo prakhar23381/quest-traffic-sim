@@ -984,7 +984,7 @@ export class NetworkSim {
   }
 
   /** MOBIL incentive (or 0 for a safe mandatory change); null if unsafe. */
-  private laneChangeGain(veh: NetVehicle, from: SimLane, to: SimLane, mandatory: boolean): number | null {
+  private laneChangeGain(veh: NetVehicle, _from: SimLane, to: SimLane, mandatory: boolean): number | null {
     const vs = to.vehicles;
     const idx = upperBound(vs, veh.pos);
     const minGap = mandatory ? 0.5 : this.driver.s0;
@@ -1358,11 +1358,6 @@ function inClearance(sig: NonNullable<NodeRT["signal"]>, movementId: string, tim
   const tc = (((time + sig.offset) % sig.cycle) + sig.cycle) % sig.cycle;
   for (const p of sig.phases) if (p.movements.has(movementId) && tc >= p.amberEnd && tc < p.end) return true;
   return false;
-}
-
-function canStopComfortably(v: number, d: number, b: number): boolean {
-  if (v < 0.5) return true;
-  return (v * v) / (2 * Math.max(d, 0.1)) <= b;
 }
 
 /** Time since the movement's signal last turned red (s). */
