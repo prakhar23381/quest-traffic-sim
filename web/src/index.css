@@ -749,6 +749,12 @@ td.bad {
   justify-content: flex-start;
   align-items: center;
 }
+.change-map {
+  height: min(520px, 70vh);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
 .compare .charts {
   margin-top: 16px;
 }

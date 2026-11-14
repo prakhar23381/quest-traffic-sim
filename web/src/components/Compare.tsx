@@ -2,6 +2,7 @@ import { catalogEntry, type Sample } from "@traffic/engine";
 import { clock, int, num } from "../lib/format";
 import { kpiRows, SERIES, type RunRecord } from "./Results";
 import { LineChart } from "./LineChart";
+import { ChangeMap } from "./ChangeMap";
 
 interface Props {
   runs: RunRecord[];
@@ -107,6 +108,12 @@ export function Compare({ runs, a, b, onPick }: Props) {
             </table>
           </div>
           <p className="hint">▲ better, ▼ worse. One seed per run: differences of a few percent can be noise, so try another seed before concluding.</p>
+          {A.result.scenario.networkId === B.result.scenario.networkId && (
+            <>
+              <h3>Where it changed</h3>
+              <ChangeMap a={A.result} b={B.result} />
+            </>
+          )}
           <div className="charts">
             {(
               [
