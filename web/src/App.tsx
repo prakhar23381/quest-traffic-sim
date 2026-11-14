@@ -177,12 +177,12 @@ export default function App() {
           <label className="field run-where">
             <span>Run on</span>
             <select value={runMode} onChange={(e) => setRunMode(e.target.value as RunMode)} disabled={!!active}>
-              <option value="auto">Auto: server if it is quick, else this browser</option>
+              <option value="auto">Auto (fastest)</option>
               <option value="browser">This browser</option>
               <option value="server">The server</option>
             </select>
           </label>
-          <p className="hint">Runs the whole period without drawing and adds it to Results, where you can compare it with other runs. Both give identical results.</p>
+          <p className="hint">Runs the whole period without drawing and adds it to Results, where you can compare it with other runs. Auto uses the server when it would be quick, otherwise your browser; both give identical results.</p>
         </div>
       </aside>
 
