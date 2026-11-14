@@ -5,7 +5,7 @@ const port = Number(process.env.PORT ?? 8080);
 const { app, store, runner } = await buildApp({
   dbPath: process.env.DB_PATH ?? "traffic.db",
   staticDir: process.env.STATIC_DIR,
-  trustProxy: process.env.TRUST_PROXY === "1",
+  trustProxy: process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : undefined,
   concurrency: Number(process.env.RUN_CONCURRENCY ?? 2),
   maxQueue: Number(process.env.RUN_MAX_QUEUE ?? 20),
   runTimeoutMs: Number(process.env.RUN_TIMEOUT_MS ?? 120_000),

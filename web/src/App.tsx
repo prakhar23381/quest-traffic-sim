@@ -45,11 +45,17 @@ export default function App() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [runMode, setRunMode] = useState<RunMode>("auto");
   const runKey = useRef(1);
+  const [linkError, setLinkError] = useState<string | null>(() =>
+    /[#&]s=/.test(location.hash) && !scenarioFromHash(location.hash) ? "This link's scenario could not be read (it may be damaged or from another version), so the default scenario is shown." : null,
+  );
 
   // ?id=... loads a stored scenario from the server
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("id");
-    if (id) void loadStoredScenario(id).then((s) => s && setScenario(s));
+    if (id)
+      void loadStoredScenario(id).then((s) =>
+        s ? setScenario(s) : setLinkError("This short link was not found. Saved links are lost when the free server restarts; use a link with the scenario in it (Share copies one when the server is down)."),
+      );
   }, []);
   // keep the URL in sync so any state can be bookmarked or shared
   useEffect(() => {
@@ -142,6 +148,14 @@ export default function App() {
         </div>
       </header>
 
+      {linkError && (
+        <div className="banner" role="alert">
+          <span>{linkError}</span>
+          <button type="button" className="link" onClick={() => setLinkError(null)}>
+            Dismiss
+          </button>
+        </div>
+      )}
       <aside className={`side ${panelOpen ? "open" : ""}`} aria-label="Scenario editor">
         <Editor scenario={scenario} onChange={setScenario} entry={entry} net={net} selected={selected} onSelect={setSelected} />
         <div className="run-box">

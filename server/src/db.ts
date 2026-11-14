@@ -15,6 +15,9 @@ export interface RunRow {
   error: string | null;
 }
 
+/** finished runs older than this are deleted */
+export const RUN_RETENTION_MS = 24 * 3600 * 1000;
+
 export const newId = (): string => randomBytes(9).toString("base64url");
 
 export class Store {
@@ -50,6 +53,8 @@ export class Store {
 
   createRun(scenarioJson: string, scenarioId: string | null): string {
     const id = newId();
+    // keep the store bounded: finished runs are only needed while someone is looking at them
+    this.db.prepare("DELETE FROM runs WHERE finished_at IS NOT NULL AND finished_at < ?").run(Date.now() - RUN_RETENTION_MS);
     this.db
       .prepare("INSERT INTO runs (id, scenario_id, scenario_json, status, created_at) VALUES (?, ?, ?, 'queued', ?)")
       .run(id, scenarioId, scenarioJson, Date.now());

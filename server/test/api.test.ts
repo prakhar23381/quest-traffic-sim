@@ -141,3 +141,15 @@ describe("speed report", () => {
     expect((await app.inject("/api/health")).json().simRate).toBeGreaterThan(1);
   });
 });
+
+describe("client address behind a proxy", () => {
+  it("trusts only the configured number of hops, so a forged X-Forwarded-For cannot dodge rate limits", async () => {
+    const { app } = await make({ runRateLimit: 1, trustProxy: 1 });
+    const post = (xff: string) =>
+      app.inject({ method: "POST", url: "/api/runs", payload: { scenario: short() }, headers: { "x-forwarded-for": xff }, remoteAddress: "10.0.0.1" });
+    // the proxy appends the real client (203.0.113.7); the forged entry before it is ignored
+    expect((await post("1.1.1.1, 203.0.113.7")).statusCode).toBe(202);
+    expect((await post("2.2.2.2, 203.0.113.7")).statusCode).toBe(429);
+    expect((await post("198.51.100.9")).statusCode).toBe(202);
+  });
+});

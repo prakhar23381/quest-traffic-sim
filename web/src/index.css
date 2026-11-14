@@ -147,7 +147,7 @@ input[type="range"] {
 .app {
   display: grid;
   grid-template-columns: 340px 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   height: 100%;
 }
 .top {
@@ -200,6 +200,21 @@ input[type="range"] {
 }
 .mobile-only {
   display: none;
+}
+.banner {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--warn-bg);
+  border-bottom: 1px solid var(--warn-border);
+  font-size: 13px;
+}
+.side,
+.main {
+  grid-row: 3;
 }
 .side {
   overflow-y: auto;
@@ -761,7 +776,7 @@ td.bad {
 @media (max-width: 900px) {
   .app {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
   }
   .top {
     flex-wrap: wrap;

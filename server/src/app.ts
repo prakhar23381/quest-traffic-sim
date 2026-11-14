@@ -29,12 +29,18 @@ export interface AppOptions {
   logger?: boolean;
   /** directory of the built web app to serve at / (production: one container, one URL) */
   staticDir?: string;
-  /** trust X-Forwarded-For (behind the host's proxy), so rate limits apply per client */
-  trustProxy?: boolean;
+  /**
+   * Number of proxy hops in front of the server whose X-Forwarded-For entries are trusted.
+   * A count, not `true`: trusting everything would let a client forge its address and dodge
+   * the per-client rate limits.
+   */
+  trustProxy?: number;
+  /** requests per minute per client for POST /api/scenarios */
+  saveRateLimit?: number;
 }
 
 export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyInstance; store: Store; runner: Runner }> {
-  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 256 * 1024, trustProxy: opts.trustProxy ?? false });
+  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 256 * 1024, trustProxy: opts.trustProxy ? (_addr: string, hop: number) => hop < opts.trustProxy! : false });
   const store = new Store(opts.dbPath ?? ":memory:");
   const runner = new Runner(store, {
     concurrency: opts.concurrency ?? 2,
@@ -62,7 +68,7 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
     return { id: e.id, name: e.name, description: e.description, osm: e.osm, network: e.network, demand: e.demand, toggles: e.toggles };
   });
 
-  app.post<{ Body: { scenario?: unknown } }>("/api/scenarios", async (req, reply) => {
+  app.post<{ Body: { scenario?: unknown } }>("/api/scenarios", { config: { rateLimit: { max: opts.saveRateLimit ?? 30, timeWindow: "1 minute" } } }, async (req, reply) => {
     try {
       const prep = prepareScenario(req.body?.scenario);
       const id = store.saveScenario(JSON.stringify(prep.scenario));

@@ -235,6 +235,27 @@ Phase 2 fixes:
 **Gridlock is real, not a fault.** At 2.5× demand the grid locks up. Tracing each stuck queue to the
 link it waits on gives a closed loop around one block, each link full and waiting on the next.
 
+## 10. Edge cases (Phase 7)
+
+Run through `runScenario` (the code path the app and the server use) on Silk Board unless noted.
+None crashed; each failure mode is reported in the results rather than hidden.
+
+| Scenario | Outcome |
+|---|---|
+| Zero demand | Empty run, all measures 0 |
+| Every road closed | 0 trips entered; all 400 generated trips reported as "no route"; one warning per unreachable origin–destination pair |
+| Both flyovers closed, 30 min | 600 trips done, 399 with no route (southbound through traffic has no ground route), 7 removed by gridlock relief |
+| 3× demand, 2 h | Gridlock flagged at 15:00; 7,297 vehicles waiting to enter; 321 removed by gridlock relief and the wrong-lane rule (5 %); **hardest braking 12.7 m/s²** |
+| 3× demand, 2 h, signals retimed | Gridlock at 17:00; similar totals; hardest braking 11.3 m/s² |
+| Every signal phase at the 5 s minimum | Runs; mean travel time 208 s vs 160 s at the designed timings |
+| Every road 1 lane of 2.5 m | Runs; slower (301 s mean travel time), 38 waiting at the end |
+| Every road 6 lanes | Runs; fastest (165 s) |
+| Each network at 3× demand, retimed | All complete; Silk Board and the grid flag gridlock, the others queue at their entrances |
+
+**Finding:** under heavy overload the worst single braking event exceeds the 9.8 m/s² seen at
+normal demand (12.7 m/s² at 3× demand over two hours). Where it happens has not been
+investigated; it is listed under known limitations and was not chased this close to the deadline.
+
 ## Known limitations
 
 - **Demand is synthetic.** Nothing is calibrated against observed counts; results show relative
@@ -254,6 +275,7 @@ link it waits on gives a closed loop around one block, each link full and waitin
 - **Gridlock relief removes vehicles** (about 100 an hour at 2× demand on Silk Board). They are
   counted and reported, never hidden.
 - **Firm braking.** 2–4 % of vehicles at Silk Board brake harder than 5 m/s² at some point, mostly at
-  one 2→1 lane drop into a 30 km/h slip road; the worst over five seeds is 9.8 m/s².
+  one 2→1 lane drop into a 30 km/h slip road; the worst over five seeds is 9.8 m/s². Under heavy
+  overload (3× demand) single events reach 11–13 m/s² (§10; location not investigated).
 - **Homogeneous vehicles** (cars only) and lane-based driving; no two-wheeler filtering.
 - **Routing is reactive** (current measured travel times at departure), not a predictive equilibrium.
