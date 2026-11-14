@@ -12,6 +12,9 @@
  */
 import Fastify, { type FastifyInstance } from "fastify";
 import rateLimit from "@fastify/rate-limit";
+import fastifyStatic from "@fastify/static";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
 import { CATALOG, catalogEntry, ENGINE_VERSION, LIMITS, prepareScenario, ScenarioError } from "@traffic/engine";
 import { Store } from "./db";
 import { Runner } from "./runner";
@@ -24,10 +27,14 @@ export interface AppOptions {
   /** requests per minute per IP for POST /api/runs */
   runRateLimit?: number;
   logger?: boolean;
+  /** directory of the built web app to serve at / (production: one container, one URL) */
+  staticDir?: string;
+  /** trust X-Forwarded-For (behind the host's proxy), so rate limits apply per client */
+  trustProxy?: boolean;
 }
 
 export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyInstance; store: Store; runner: Runner }> {
-  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 256 * 1024 });
+  const app = Fastify({ logger: opts.logger ?? false, bodyLimit: 256 * 1024, trustProxy: opts.trustProxy ?? false });
   const store = new Store(opts.dbPath ?? ":memory:");
   const runner = new Runner(store, {
     concurrency: opts.concurrency ?? 2,
@@ -108,6 +115,25 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
       result: r.result ? JSON.parse(r.result) : undefined,
       error: r.error ?? undefined,
     };
+  });
+
+  if (opts.staticDir && existsSync(opts.staticDir)) {
+    const root = resolve(opts.staticDir);
+    await app.register(fastifyStatic, {
+      root,
+      // hashed asset names can be cached forever; index.html must always be revalidated
+      cacheControl: false,
+      setHeaders: (res, path) => void res.header("cache-control", path.includes("/assets/") ? "public, max-age=31536000, immutable" : "no-cache"),
+    });
+    app.addHook("onSend", async (_req, reply, payload) => {
+      reply.header("x-content-type-options", "nosniff");
+      reply.header("referrer-policy", "strict-origin-when-cross-origin");
+      return payload;
+    });
+  }
+  app.setNotFoundHandler((req, reply) => {
+    if (req.url.startsWith("/api/") || !opts.staticDir || req.method !== "GET") return reply.code(404).send({ error: "not found" });
+    return reply.sendFile("index.html");
   });
 
   return { app, store, runner };

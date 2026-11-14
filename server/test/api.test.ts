@@ -110,3 +110,24 @@ describe("runs", () => {
     expect(codes).toEqual([202, 202, 429]);
   });
 });
+
+describe("static web app", () => {
+  it("serves the built app at / and falls back to index.html, but never for /api", async () => {
+    const { mkdtempSync, writeFileSync, mkdirSync } = await import("node:fs");
+    const { tmpdir } = await import("node:os");
+    const { join } = await import("node:path");
+    const dir = mkdtempSync(join(tmpdir(), "web-"));
+    writeFileSync(join(dir, "index.html"), "<!doctype html><title>app</title>");
+    mkdirSync(join(dir, "assets"));
+    writeFileSync(join(dir, "assets", "a.js"), "1");
+    const { app } = await make({ staticDir: dir });
+    const home = await app.inject("/");
+    expect(home.statusCode).toBe(200);
+    expect(home.body).toContain("<title>app</title>");
+    expect(home.headers["cache-control"]).toBe("no-cache");
+    expect((await app.inject("/assets/a.js")).headers["cache-control"]).toContain("immutable");
+    expect((await app.inject("/some/page?id=x")).body).toContain("<title>app</title>");
+    expect((await app.inject("/api/nope")).statusCode).toBe(404);
+    expect((await app.inject("/api/nope")).json().error).toBe("not found");
+  });
+});
