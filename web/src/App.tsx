@@ -7,6 +7,7 @@ import { MapView } from "./components/MapView";
 import { Results, type RunRecord } from "./components/Results";
 import { SpeedLegend } from "./components/SpeedLegend";
 import { Info, TooltipLayer } from "./components/Tooltip";
+import { LinkIcon, Mark, Moon, Sun } from "./components/Icons";
 import { clock, int, num } from "./lib/format";
 import { layerName, linkLabel } from "./lib/labels";
 import { RunError, startRun, type RunHandle, type RunMode, type RunSource } from "./lib/runs";
@@ -125,12 +126,9 @@ export default function App() {
   return (
     <div className="app">
       <header className="top">
-        <div className="brand">
-          <img src="/favicon.svg" alt="" />
-          <div>
-            <h1>Junction Lab</h1>
-            <span>traffic simulator</span>
-          </div>
+        <div className="brand" data-tip="Agent-based traffic simulation of junctions and flyovers">
+          <Mark />
+          <h1 className="display">Junction Lab</h1>
         </div>
         <nav className="tabs" role="tablist">
           {tabs.map(([id, label]) => (
@@ -147,14 +145,15 @@ export default function App() {
           )}
           <button
             type="button"
-            className="theme-toggle"
+            className="icon-btn"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
             data-tip={theme === "dark" ? "Light theme" : "Dark theme"}
           >
-            {theme === "dark" ? "☀" : "☾"}
+            {theme === "dark" ? <Sun /> : <Moon />}
           </button>
-          <button type="button" onClick={share} data-tip="Copy a link that opens this exact scenario">
+          <button type="button" className="share" onClick={share} data-tip="Copy a link that opens this exact scenario">
+            <LinkIcon />
             Share
           </button>
           <button type="button" className="mobile-only" onClick={() => setPanelOpen((o) => !o)} aria-expanded={panelOpen}>
