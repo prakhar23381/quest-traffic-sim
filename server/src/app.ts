@@ -46,6 +46,19 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
     concurrency: opts.concurrency ?? 2,
     maxQueue: opts.maxQueue ?? 20,
     timeoutMs: opts.runTimeoutMs ?? 120_000,
+    onError: (error, what) => app.log.error({ err: error, what }, "database write failed"),
+  });
+  if (opts.staticDir && !existsSync(opts.staticDir)) {
+    throw new Error(`STATIC_DIR "${opts.staticDir}" does not exist (build the web app first, or leave STATIC_DIR unset to serve the API only)`);
+  }
+
+  // Never send internals to clients: a full disk is "unavailable", anything else a plain 500.
+  app.setErrorHandler((error: Error & { statusCode?: number; code?: string }, req, reply) => {
+    const status = error.statusCode ?? 500;
+    if (status < 500) return reply.send(error); // Fastify's own 4xx (bad JSON, 413, 429 ...)
+    req.log.error({ err: error }, "request failed");
+    if (error.code === "SQLITE_FULL") return reply.code(503).send({ error: "storage is full, try again later" });
+    return reply.code(500).send({ error: "internal error" });
   });
   await app.register(rateLimit, { global: true, max: 300, timeWindow: "1 minute" });
 
@@ -85,12 +98,15 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
     return { id: req.params.id, scenario: JSON.parse(json) };
   });
 
-  app.post<{ Body: { scenario?: unknown; scenarioId?: string } }>(
+  app.post<{ Body: { scenario?: unknown; scenarioId?: unknown } }>(
     "/api/runs",
     { config: { rateLimit: { max: opts.runRateLimit ?? 20, timeWindow: "1 minute" } } },
     async (req, reply) => {
       let input = req.body?.scenario;
       const scenarioId = req.body?.scenarioId ?? null;
+      if (scenarioId !== null && (typeof scenarioId !== "string" || scenarioId.length > 64)) {
+        return reply.code(400).send({ error: "invalid request", issues: ["scenarioId: expected a string of at most 64 characters"] });
+      }
       if (scenarioId) {
         const json = store.getScenario(scenarioId);
         if (!json) return reply.code(404).send({ error: "unknown scenario" });
@@ -103,7 +119,7 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
         if (e instanceof ScenarioError) return reply.code(400).send(bad(e.issues));
         throw e;
       }
-      const id = store.createRun(JSON.stringify(scenario), scenarioId);
+      const id = store.createRun(JSON.stringify(scenario), scenarioId as string | null);
       if (!runner.submit(id, scenario)) {
         store.finishRun(id, "failed", null, "server busy");
         return reply.code(503).send({ error: "server busy, try again shortly" });
@@ -123,7 +139,7 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
     };
   });
 
-  if (opts.staticDir && existsSync(opts.staticDir)) {
+  if (opts.staticDir) {
     const root = resolve(opts.staticDir);
     await app.register(fastifyStatic, {
       root,

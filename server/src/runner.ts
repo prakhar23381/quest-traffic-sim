@@ -9,6 +9,8 @@ export interface RunnerOptions {
   concurrency: number;
   maxQueue: number;
   timeoutMs: number;
+  /** called when a database write fails (disk full, locked, ...); the runner itself carries on */
+  onError?: (error: unknown, what: string) => void;
 }
 
 interface Job {
@@ -35,6 +37,17 @@ export class Runner {
     const target = new URL("./runWorker.ts", import.meta.url).href;
     const boot = `import("tsx/esm/api").then(({ register }) => { register(); return import(${JSON.stringify(target)}); })`;
     return new Worker(boot, { eval: true, workerData });
+  }
+
+  /** Store calls run inside worker event handlers, where an exception would end the process. */
+  private guard(what: string, fn: () => void): boolean {
+    try {
+      fn();
+      return true;
+    } catch (e) {
+      this.opts.onError?.(e, what);
+      return false;
+    }
   }
 
   get pending(): number {
@@ -64,15 +77,18 @@ export class Runner {
       if (settled) return;
       settled = true;
       clearTimeout(timer);
-      this.store.finishRun(job.id, status, result, error);
+      if (!this.guard("finishRun", () => this.store.finishRun(job.id, status, result, error))) {
+        // the result could not be stored (disk full?): record the failure with the smallest possible write
+        this.guard("finishRun(failed)", () => this.store.finishRun(job.id, "failed", null, "could not store the result"));
+      }
       this.active--;
       void w.terminate();
       this.pump();
     };
     const timer = setTimeout(() => finish("failed", null, `timed out after ${this.opts.timeoutMs / 1000} s`), this.opts.timeoutMs);
-    this.store.setProgress(job.id, 0);
+    this.guard("setProgress", () => this.store.setProgress(job.id, 0));
     w.on("message", (m: { type: string; progress?: number; result?: unknown }) => {
-      if (m.type === "progress") this.store.setProgress(job.id, m.progress!);
+      if (m.type === "progress") this.guard("setProgress", () => this.store.setProgress(job.id, m.progress!));
       else if (m.type === "result") {
         const r = m.result as { durationS: number; wallMs: number };
         if (r.wallMs > 0) {

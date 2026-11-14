@@ -219,7 +219,13 @@ label[data-tip] {
 }
 button small {
   font-weight: 400;
+}
+button:not(.primary) small {
   opacity: 0.6;
+}
+/* an explicit colour, not opacity: same 60 % look (5.7:1 on the white button), and checkers read it correctly */
+button.primary small {
+  color: color-mix(in srgb, var(--primary-ink) 60%, var(--primary));
 }
 .kpis dd small {
   font-size: 13px;
@@ -740,6 +746,12 @@ details.signal summary small {
   padding: 8px 16px;
   margin: 0;
 }
+.hud-stat-list {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0;
+}
 .hud-stats dt {
   font-size: 12px;
   letter-spacing: -0.01em;
@@ -1134,9 +1146,12 @@ td.bad {
   .speed > span {
     display: none;
   }
-  .hud-stats {
+  .hud-stats,
+  .hud-stat-list {
     gap: 6px 12px;
     flex-wrap: wrap;
+  }
+  .hud-stats {
     padding: 6px 10px;
   }
   .hud-stats dd {

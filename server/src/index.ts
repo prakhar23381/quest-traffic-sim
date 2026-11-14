@@ -1,17 +1,38 @@
 import { defaultScenario } from "@traffic/engine";
 import { buildApp } from "./app";
+import { ConfigError, loadConfig } from "./config";
+import { createShutdown } from "./shutdown";
 
-const port = Number(process.env.PORT ?? 8080);
+let cfg;
+try {
+  cfg = loadConfig(process.env);
+} catch (e) {
+  if (e instanceof ConfigError) {
+    console.error("Invalid configuration:\n" + e.problems.map((p) => "  - " + p).join("\n"));
+    process.exit(2);
+  }
+  throw e;
+}
+
 const { app, store, runner } = await buildApp({
-  dbPath: process.env.DB_PATH ?? "traffic.db",
-  staticDir: process.env.STATIC_DIR,
-  trustProxy: process.env.TRUST_PROXY ? Number(process.env.TRUST_PROXY) : undefined,
-  concurrency: Number(process.env.RUN_CONCURRENCY ?? 2),
-  maxQueue: Number(process.env.RUN_MAX_QUEUE ?? 20),
-  runTimeoutMs: Number(process.env.RUN_TIMEOUT_MS ?? 120_000),
+  dbPath: cfg.dbPath,
+  staticDir: cfg.staticDir,
+  trustProxy: cfg.trustProxy || undefined,
+  concurrency: cfg.concurrency,
+  maxQueue: cfg.maxQueue,
+  runTimeoutMs: cfg.runTimeoutMs,
   logger: true,
 });
-await app.listen({ port, host: "0.0.0.0" });
+await app.listen({ port: cfg.port, host: "0.0.0.0" });
+
+const shutdown = createShutdown({
+  close: () => app.close(),
+  failUnfinished: (reason) => store.failUnfinished(reason),
+  exit: (code) => process.exit(code),
+  log: (m) => app.log.info(m),
+});
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
+process.on("SIGINT", () => void shutdown("SIGINT"));
 
 // Measure how fast this machine simulates (reported by /api/health), so the web app can
 // decide whether a run is quicker here or in the visitor's browser.

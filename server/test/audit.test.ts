@@ -47,10 +47,8 @@ describe("malformed requests are 4xx with no leaked internals", () => {
     noLeak(r.body);
   });
 
-  // KNOWN BUG F-1 (see RELEASE_READINESS.md): a non-string scenarioId reaches SQLite unvalidated and
-  // returns 500 with the library's error text. `it.fails` keeps the suite green while documenting it;
-  // when the bug is fixed this test will start failing, which is the cue to turn it into a plain `it`.
-  it.fails.each([[{ $ne: 1 }], [[]], [true]])("F-1: scenarioId %j is a 4xx, not a 500", async (sid) => {
+  // F-1 (fixed): a non-string scenarioId used to reach SQLite and return 500 with the library's message.
+  it.each([[{ $ne: 1 }], [[]], [true], [{ a: 1 }], ["x".repeat(65)]])("F-1: scenarioId %j is a 4xx, not a 500", async (sid) => {
     const app = await make();
     const r = await post(app, "/api/runs", JSON.stringify({ scenarioId: sid }));
     expect(r.statusCode).toBeGreaterThanOrEqual(400);

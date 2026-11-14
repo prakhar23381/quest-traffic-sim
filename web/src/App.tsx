@@ -260,7 +260,7 @@ export default function App() {
                 </button>
                 <label className="speed" data-tip="Simulated seconds per real second">
                   <span>Speed</span>
-                  <select value={live.speed} onChange={(e) => live.setSpeed(Number(e.target.value))}>
+                  <select aria-label="Playback speed" value={live.speed} onChange={(e) => live.setSpeed(Number(e.target.value))}>
                     {SPEEDS.map((x) => (
                       <option key={x} value={x}>
                         {x === 0 ? "max" : `${x}×`}
@@ -270,11 +270,12 @@ export default function App() {
                 </label>
               </div>
               {st && (
-                <dl className="hud-stats">
+                <div className="hud-stats">
                   <span className={`badge ${live.playing ? "live" : ""}`} role="status">
                     <i className="live-dot" aria-hidden="true" />
                     {live.playing ? `Live · ${num(st.rate, 0)}×` : st.t >= st.durationS ? "Finished" : "Paused"}
                   </span>
+                  <dl className="hud-stat-list">
                   <div>
                     <dt data-tip="Simulated time / length of the run">Time</dt>
                     <dd>
@@ -298,6 +299,7 @@ export default function App() {
                     <dd>{num(st.meanSpeedKmh, 0)} km/h</dd>
                   </div>
                 </dl>
+                </div>
               )}
             </div>
             <SpeedLegend title="Vehicle speed" />
@@ -335,8 +337,8 @@ export default function App() {
           ))}
         {tab === "compare" && <Compare runs={runs} a={pair.a} b={pair.b} onPick={(w, k) => setPair((p) => ({ ...p, [w]: k }))} />}
         {tab === "about" && <About />}
+        <TooltipLayer />
       </main>
-      <TooltipLayer />
     </div>
   );
 }

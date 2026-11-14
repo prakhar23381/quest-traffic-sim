@@ -49,6 +49,25 @@ otherwise the visitor's browser (same engine, identical results). Saved short li
 are lost when the free instance restarts; links carrying the scenario in the URL (`#s=`)
 always work.
 
+### Configuration
+The server reads these environment variables. All are optional (empty counts as unset); a value that is not valid
+stops the server at startup with a message naming it (exit code 2), rather than starting in a broken state.
+
+| Variable | Default | Allowed | Meaning |
+|---|---|---|---|
+| `PORT` | 8080 | 1–65535 | listening port (the Docker image sets 7860) |
+| `DB_PATH` | `traffic.db` | a writable file path | SQLite file (the image uses `/tmp`, wiped on restart) |
+| `STATIC_DIR` | unset | an existing directory | serve the built web app here; unset = API only |
+| `TRUST_PROXY` | 0 | 0–5 | proxy hops whose `X-Forwarded-For` is trusted; set 1 only behind exactly one proxy (Render) |
+| `RUN_CONCURRENCY` | 2 | 1–16 | simulations run at once |
+| `RUN_MAX_QUEUE` | 20 | 1–1000 | queued runs before the server answers 503 |
+| `RUN_TIMEOUT_MS` | 120000 | 1000–3600000 | wall-clock limit per run |
+
+On `SIGTERM`/`SIGINT` the server stops accepting connections, marks unfinished runs `failed: server shut down`
+and exits 0 (a `docker stop` takes well under a second). Saved scenarios are kept for 7 days and finished runs
+for 24 hours, with hard caps (5000 scenarios, 500 runs). When the disk is full, writes answer 503 instead of
+crashing the process.
+
 ## Develop
 ```bash
 npm install

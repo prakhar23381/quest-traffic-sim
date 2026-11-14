@@ -13,6 +13,28 @@ Branch: `release-readiness/2026-11-15` (new tests and manifests only; **no appli
 - One **High** and seven **Medium** findings remain. The High (F-3) lets a single unauthenticated client crash the server by filling its disk; on Render the crash is self-healing (restart, ephemeral disk), so the impact is downtime, not data loss.
 - Conditions before relying on it for real traffic: fix F-3, F-1 and F-4 (each a few lines); the rest are recommended. Whether to fix them before the application deadline is the owner's call.
 
+## 1b. Update: fixes applied (branch `fix/audit-findings`)
+
+The recommended findings were fixed after the audit and each fix was re-verified against the **built Docker image**, not only in unit tests. Where the new tests guard a fix, they were also run against the old code and fail there.
+
+| Finding | Status | Re-verification |
+|---|---|---|
+| F-3 disk full crashes the server | **Fixed** | tmpfs 300 kB, 8 runs submitted: container stays up, writes answer `503 storage is full`, health stays ok, 30 write failures logged. Scenarios and runs are now pruned and capped. Old runner code fails the new test. |
+| F-1 non-string `scenarioId` → 500 | **Fixed** | `{"a":1}`, `[]`, `true` → `400` with a clear message; 5 tests (they failed against the old code). Unexpected errors now return a plain `{"error":"internal error"}`. |
+| F-4 bad run-limit settings | **Fixed** | 18 malformed values rejected by unit tests; in the image, `RUN_CONCURRENCY=abc/0`, `RUN_TIMEOUT_MS=abc`, `RUN_MAX_QUEUE=abc`, `PORT=abc` exit with code 2 and a message naming the setting. |
+| F-13 empty `PORT` | **Fixed** | empty means unset (default), not a random port |
+| F-5 missing `STATIC_DIR` | **Fixed** | the image exits 2 at startup; `buildApp` also refuses it |
+| F-2 SIGTERM ignored | **Fixed** | `docker stop` with a run in flight: 195 ms, exit 0 (was 10 s, 137); the run is recorded as `failed: server shut down` |
+| F-9 accessibility (3 violations + 1 false positive) | **Fixed** | axe on 5 views × 2 themes + phone: **0 violations**, 0 console errors; button label contrast unchanged at 5.74:1 |
+| F-6 no CI, auto-deploy untested | Open | needs a workflow and a Render setting (deploy only after checks pass) |
+| F-7 / F-8 base-image CVEs, unpinned tag | Open | Alpine variant tested (0 HIGH/CRITICAL, 286 MB, identical results) but not applied: it changes the production image |
+| F-10 web has no tests, 8 lint warnings | Open | unchanged |
+| F-11 / F-12 headers, logging, runbook | Open (info) | unchanged |
+
+**New residual risk found while fixing F-3:** when the disk is full, a run already in flight cannot store its result, so it shows `running` until the next restart. The server stays up and new writes fail cleanly; the web app's Auto mode abandons a stalled server run after 15 s and reruns it in the browser, but "Run on: The server" waits indefinitely.
+
+**Updated verdict: GO.** The three conditions in section 1 (F-3, F-1, F-4) are met; the open items are recommendations. Tests after the fixes: engine 92, server 90 (all pass); types, build and lint (8 pre-existing warnings, 0 errors) unchanged.
+
 ## 2. Summary
 
 | Phase | Status | Key evidence |
@@ -129,4 +151,4 @@ Logs are JSON with a request ID on every line; they include client IP addresses 
 - The reproduction commands above were run once each on a macOS host with Docker; they have not been run in CI or by a second person.
 
 ## Appendix: what was added on this branch
-`engine/test/fuzz.test.ts` (5 property tests, `FUZZ_SCALE=8` for a heavy run), `server/test/audit.test.ts` (43 hostile-HTTP tests, 3 expected-fail tests that document F-1), `fast-check` and the V8 coverage plugin as engine dev-dependencies. Test totals on the branch: engine 92 passed; server 52 passed + 3 expected-fail.
+`engine/test/fuzz.test.ts` (5 property tests, `FUZZ_SCALE=8` for a heavy run), `server/test/audit.test.ts` (43 hostile-HTTP tests; the F-1 tests started as expected-fail and became normal tests once fixed), `server/test/fixes.test.ts` (regression tests for F-2, F-3, F-4, F-5, F-13), `fast-check` and the V8 coverage plugin as engine dev-dependencies. Test totals on the branch: engine 92 passed; server 52 passed + 3 expected-fail.
