@@ -45,7 +45,7 @@ export async function buildApp(opts: AppOptions = {}): Promise<{ app: FastifyIns
 
   const bad = (issues: string[]) => ({ error: "invalid scenario", issues });
 
-  app.get("/api/health", async () => ({ ok: true, engine: ENGINE_VERSION, pendingRuns: runner.pending, limits: LIMITS }));
+  app.get("/api/health", async () => ({ ok: true, engine: ENGINE_VERSION, pendingRuns: runner.pending, simRate: runner.simRate, limits: LIMITS }));
 
   app.get("/api/networks", async () =>
     CATALOG.map((e) => ({

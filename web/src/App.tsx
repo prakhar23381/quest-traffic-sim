@@ -8,7 +8,7 @@ import { Results, type RunRecord } from "./components/Results";
 import { SpeedLegend } from "./components/SpeedLegend";
 import { clock, int, num } from "./lib/format";
 import { layerName, linkLabel } from "./lib/labels";
-import { RunError, startRun, type RunHandle, type RunSource } from "./lib/runs";
+import { RunError, startRun, type RunHandle, type RunMode, type RunSource } from "./lib/runs";
 import { loadStoredScenario, saveScenario, scenarioFromHash, scenarioHash } from "./lib/share";
 import { useLiveSim } from "./lib/useLiveSim";
 
@@ -39,10 +39,11 @@ export default function App() {
   const [runs, setRuns] = useState<RunRecord[]>([]);
   const [shown, setShown] = useState<number | null>(null);
   const [pair, setPair] = useState<{ a: number | null; b: number | null }>({ a: null, b: null });
-  const [active, setActive] = useState<{ progress: number; source: RunSource; handle: RunHandle } | null>(null);
+  const [active, setActive] = useState<{ progress: number; source: RunSource; handle: RunHandle; started: boolean } | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [runMode, setRunMode] = useState<RunMode>("auto");
   const runKey = useRef(1);
 
   // ?id=... loads a stored scenario from the server
@@ -71,12 +72,12 @@ export default function App() {
     if (!prepared.ok || active) return;
     setRunError(null);
     const s = prepared.prep.scenario;
-    const handle = startRun(s, (progress, source) => setActive((a) => (a ? { ...a, progress, source } : a)));
-    setActive({ progress: 0, source: "server", handle });
+    const handle = startRun(s, (progress, source) => setActive((a) => (a ? { ...a, progress, source, started: true } : a)), runMode);
+    setActive({ progress: 0, source: runMode === "browser" ? "browser" : "server", handle, started: false });
     handle.promise
-      .then(({ result, source }) => {
+      .then(({ result, source, note }) => {
         const key = runKey.current++;
-        const rec: RunRecord = { key, label: `Run ${key}: ${describe(s)}`, result, source };
+        const rec: RunRecord = { key, label: `Run ${key}: ${describe(s)}`, result, source, note };
         setRuns((rs) => [...rs, rec]);
         setShown(key);
         // the first run stays the baseline; the newest run is the alternative
@@ -157,7 +158,7 @@ export default function App() {
                 <div style={{ width: `${Math.round(active.progress * 100)}%` }} />
               </div>
               <span>
-                Running {active.source === "server" ? "on the server" : "in your browser"}… {Math.round(active.progress * 100)}%
+                {active.started ? `Running ${active.source === "server" ? "on the server" : "in your browser"}… ${Math.round(active.progress * 100)}%` : "Starting…"}
               </span>
               <button type="button" className="link" onClick={() => active.handle.cancel()}>
                 Cancel
@@ -173,7 +174,15 @@ export default function App() {
               Run failed: {runError}
             </p>
           )}
-          <p className="hint">Runs the whole period without drawing and adds it to Results, where you can compare it with other runs.</p>
+          <label className="field run-where">
+            <span>Run on</span>
+            <select value={runMode} onChange={(e) => setRunMode(e.target.value as RunMode)} disabled={!!active}>
+              <option value="auto">Auto: server if it is quick, else this browser</option>
+              <option value="browser">This browser</option>
+              <option value="server">The server</option>
+            </select>
+          </label>
+          <p className="hint">Runs the whole period without drawing and adds it to Results, where you can compare it with other runs. Both give identical results.</p>
         </div>
       </aside>
 

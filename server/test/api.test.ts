@@ -131,3 +131,13 @@ describe("static web app", () => {
     expect((await app.inject("/api/nope")).json().error).toBe("not found");
   });
 });
+
+describe("speed report", () => {
+  it("health reports the measured simulation speed after a run", async () => {
+    const { app } = await make();
+    expect((await app.inject("/api/health")).json().simRate).toBeNull();
+    const r = await app.inject({ method: "POST", url: "/api/runs", payload: { scenario: short() } });
+    await waitForRun(app, r.json().id);
+    expect((await app.inject("/api/health")).json().simRate).toBeGreaterThan(1);
+  });
+});

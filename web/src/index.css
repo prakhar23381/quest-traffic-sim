@@ -334,6 +334,14 @@ details.signal summary small {
   background: var(--surface);
   border-top: 1px solid var(--border);
 }
+.run-where {
+  flex-direction: row;
+  align-items: center;
+  margin-top: 8px;
+}
+.run-where > span {
+  flex: 0 0 auto;
+}
 .run-box > button.primary {
   width: 100%;
   padding: 9px;

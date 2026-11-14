@@ -13,6 +13,8 @@ export interface RunRecord {
   label: string;
   result: RunResult;
   source: "server" | "browser";
+  /** why it ran where it did, if not where asked */
+  note?: string | null;
 }
 
 export const SERIES = ["var(--series-1)", "var(--series-2)"];
@@ -59,7 +61,7 @@ export function Results({ run }: { run: RunRecord }) {
         <header className="results-head">
           <h2>{run.label}</h2>
           <p className="hint">
-            {r.networkName} · {clock(r.durationS)} simulated in {num(r.wallMs / 1000, 1)} s ({run.source === "server" ? "on the server" : "in your browser"})
+            {r.networkName} · {clock(r.durationS)} simulated in {num(r.wallMs / 1000, 1)} s ({run.source === "server" ? "on the server" : "in your browser"}{run.note ? `: ${run.note}` : ""})
           </p>
         </header>
         <dl className="kpis">

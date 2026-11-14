@@ -1,0 +1,19 @@
+# Render Blueprint: one free Docker web service (API + web app on one URL).
+# Dashboard → New → Blueprint → pick this repository.
+services:
+  - type: web
+    name: junction-lab
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # the free instance has ~0.1 CPU: run one simulation at a time, keep the queue short,
+      # and stop long runs early (the browser then runs them itself)
+      - key: RUN_CONCURRENCY
+        value: "1"
+      - key: RUN_MAX_QUEUE
+        value: "5"
+      - key: RUN_TIMEOUT_MS
+        value: "90000"

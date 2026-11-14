@@ -20,6 +20,8 @@ export class Runner {
   private readonly queue: Job[] = [];
   private active = 0;
   private readonly dev: boolean;
+  /** simulated seconds per wall-clock second on this machine (moving average of finished runs) */
+  simRate: number | null = null;
 
   constructor(private readonly store: Store, private readonly opts: RunnerOptions) {
     // In development the sources are TypeScript; the bundled build ships runWorker.js.
@@ -71,7 +73,14 @@ export class Runner {
     this.store.setProgress(job.id, 0);
     w.on("message", (m: { type: string; progress?: number; result?: unknown }) => {
       if (m.type === "progress") this.store.setProgress(job.id, m.progress!);
-      else if (m.type === "result") finish("done", JSON.stringify(m.result), null);
+      else if (m.type === "result") {
+        const r = m.result as { durationS: number; wallMs: number };
+        if (r.wallMs > 0) {
+          const rate = r.durationS / (r.wallMs / 1000);
+          this.simRate = this.simRate === null ? rate : 0.7 * this.simRate + 0.3 * rate;
+        }
+        finish("done", JSON.stringify(m.result), null);
+      }
     });
     w.on("error", (e: Error) => finish("failed", null, e.message));
     w.on("exit", (code) => finish("failed", null, `worker exited with code ${code}`));
