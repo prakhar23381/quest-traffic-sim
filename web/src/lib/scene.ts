@@ -6,6 +6,7 @@
  */
 import { signalState, type LinkRT, type Network, type SignalRT } from "@traffic/engine";
 import { VEH_FLOATS } from "../workers/protocol";
+import type { Basemap } from "./basemap";
 
 export interface View {
   /** pixels per metre */
@@ -161,6 +162,9 @@ export interface DrawOptions {
   heat?: Map<string, string> | null;
   selected?: string | null;
   hovered?: string | null;
+  /** street map drawn under the network (real networks only) */
+  basemap?: Basemap | null;
+  dark?: boolean;
 }
 
 export function drawScene(ctx: CanvasRenderingContext2D, scene: Scene, view: View, w: number, h: number, o: DrawOptions): void {
@@ -169,6 +173,10 @@ export function drawScene(ctx: CanvasRenderingContext2D, scene: Scene, view: Vie
   ctx.fillStyle = P.ground;
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   const dpr = ctx.canvas.width / w;
+  if (o.basemap) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    o.basemap.draw(ctx, view, w, h, !!o.dark, o.dark ? 0.55 : 0.5);
+  }
   const s = view.scale * dpr;
   ctx.setTransform(s, 0, 0, -s, (w / 2 - view.cx * view.scale) * dpr, (h / 2 + view.cy * view.scale) * dpr);
   ctx.lineCap = "round";

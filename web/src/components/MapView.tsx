@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { buildScene, DARK, drawScene, fitView, LIGHT, pickLink, toWorld, type Scene, type View } from "../lib/scene";
 import type { Network } from "@traffic/engine";
 import { useDarkMode } from "../lib/useDarkMode";
+import { Basemap, BASEMAP_ATTRIBUTION, projectionOf } from "../lib/basemap";
 
 export interface FrameData {
   buf: Float32Array;
@@ -36,10 +37,16 @@ export function MapView({ net, closed, frameRef, time = 0, heat, selected, onSel
   const lastFrame = useRef<FrameData | null>(null);
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
   const dark = useDarkMode();
+  const [showMap, setShowMap] = useState(true);
+  const basemap = useMemo(() => {
+    const proj = projectionOf(net.spec.meta);
+    return proj ? new Basemap(proj, () => (dirty.current = true)) : null;
+  }, [net]);
   const fitTopRef = useRef(fitTop);
   fitTopRef.current = fitTop;
-  const props = useRef({ closed, heat, selected, time, hover: hover?.id ?? null, dark });
-  props.current = { closed, heat, selected, time, hover: hover?.id ?? null, dark };
+  const mapOn = showMap && basemap ? basemap : null;
+  const props = useRef({ closed, heat, selected, time, hover: hover?.id ?? null, dark, mapOn });
+  props.current = { closed, heat, selected, time, hover: hover?.id ?? null, dark, mapOn };
   dirty.current = true;
 
   useEffect(() => {
@@ -96,6 +103,8 @@ export function MapView({ net, closed, frameRef, time = 0, heat, selected, onSel
         heat: p.heat,
         selected: p.selected,
         hovered: p.hover,
+        basemap: p.mapOn,
+        dark: p.dark,
       });
     };
     raf = requestAnimationFrame(loop);
@@ -212,7 +221,13 @@ export function MapView({ net, closed, frameRef, time = 0, heat, selected, onSel
         <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1.4)} aria-label="Zoom in">+</button>
         <button type="button" onClick={() => zoomAt(size.current.w / 2, size.current.h / 2, 1 / 1.4)} aria-label="Zoom out">−</button>
         <button type="button" onClick={fit} aria-label="Fit network to view" title="Fit">⤢</button>
+        {basemap && (
+          <button type="button" className={showMap ? "on" : ""} onClick={() => setShowMap((v) => !v)} aria-pressed={showMap} title="Street map underneath">
+            Map
+          </button>
+        )}
       </div>
+      {basemap && <div className="attrib">{mapOn ? BASEMAP_ATTRIBUTION : "© OpenStreetMap contributors"}</div>}
       {children}
     </div>
   );

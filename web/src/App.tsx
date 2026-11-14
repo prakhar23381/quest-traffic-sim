@@ -287,7 +287,6 @@ export default function App() {
                 ))}
               </div>
             )}
-            {entry.osm && <div className="attrib">© OpenStreetMap contributors</div>}
           </MapView>
         )}
         {tab === "results" &&

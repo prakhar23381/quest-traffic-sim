@@ -426,8 +426,12 @@ details.signal summary small {
   flex-direction: column;
   gap: 4px;
 }
+.map-zoom button.on {
+  color: var(--accent);
+  font-weight: 600;
+}
 .map-zoom button {
-  width: 32px;
+  min-width: 32px;
   height: 32px;
   padding: 0;
   background: var(--overlay);
