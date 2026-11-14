@@ -285,6 +285,76 @@ input[type="range"] {
   border-radius: var(--radius);
   padding: 10px 12px;
 }
+.xsec {
+  margin: 8px 0 4px;
+}
+.xsec svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: var(--surface);
+  border-radius: 6px;
+}
+.xs-road {
+  fill: #6b7280;
+}
+.xs-road.closed {
+  fill: #3f3f46;
+}
+.xs-mark {
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+.xs-car {
+  fill: var(--series-1);
+}
+.xs-kerb {
+  fill: #b8b8b2;
+}
+.xs-ground {
+  fill: var(--surface-2);
+}
+.xs-deck {
+  fill: #9aa0a8;
+}
+.xs-pillar {
+  fill: #b6bcc4;
+}
+.xs-dim {
+  stroke: var(--text-3);
+  stroke-width: 1;
+}
+.xs-label {
+  fill: var(--text-2);
+  font-size: 10px;
+}
+.xsec-controls {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-2);
+}
+.stepper b {
+  min-width: 14px;
+  text-align: center;
+  color: var(--text);
+}
+.stepper button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+.road-open {
+  align-self: flex-end;
+  flex: 0 0 auto;
+}
 .road-head {
   display: flex;
   justify-content: space-between;

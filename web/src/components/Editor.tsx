@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { CATALOG, LIMITS, defaultScenario, type CatalogEntry, type Network, type Scenario } from "@traffic/engine";
 import { int, num } from "../lib/format";
+import { CrossSection } from "./CrossSection";
 import { layerName, linkLabel, nodeLabel, phaseLabel } from "../lib/labels";
 
 interface Props {
@@ -135,33 +136,26 @@ export function Editor({ scenario: s, onChange, entry, net, selected, onSelect }
             <p className="hint">
               {layerName(link.layer)} · {int(link.length)} m · id {link.id}
             </p>
+            <CrossSection
+              lanes={s.linkEdits[link.id]?.lanes ?? baseLink.lanes}
+              laneWidth={s.linkEdits[link.id]?.laneWidth ?? baseLink.laneWidth ?? 3.5}
+              layer={link.layer}
+              closed={closed.has(link.id)}
+              onLanes={(n) => editLink(link.id, { lanes: Math.min(LIMITS.maxLanes, Math.max(1, n)) })}
+              onWidth={(w) => editLink(link.id, { laneWidth: w })}
+            />
             <div className="row">
-              <label className="field">
-                <span>Lanes</span>
-                <input type="number" min={1} max={LIMITS.maxLanes} value={s.linkEdits[link.id]?.lanes ?? baseLink.lanes} onChange={(e) => editLink(link.id, { lanes: Math.min(LIMITS.maxLanes, Math.max(1, Math.round(Number(e.target.value) || 1))) })} />
-              </label>
               <label className="field">
                 <span>Speed limit, km/h</span>
                 <input type="number" min={10} max={120} step={5} value={s.linkEdits[link.id]?.speedLimitKmh ?? baseLink.speedLimitKmh} onChange={(e) => editLink(link.id, { speedLimitKmh: Math.min(120, Math.max(10, Number(e.target.value) || 10)) })} />
               </label>
-              <label className="field">
-                <span>Lane width</span>
-                <select value={s.linkEdits[link.id]?.laneWidth ?? baseLink.laneWidth ?? 3.5} onChange={(e) => editLink(link.id, { laneWidth: Number(e.target.value) })}>
-                  {[2.5, 2.75, 3, 3.25, 3.5, 3.75, 4].map((w) => (
-                    <option key={w} value={w}>
-                      {w} m
-                    </option>
-                  ))}
-                </select>
+              <label className="switch road-open">
+                <input type="checkbox" checked={!closed.has(link.id)} onChange={() => toggleClosed(link.id)} />
+                <span>
+                  <b>Road</b> {closed.has(link.id) ? "closed" : "open"}
+                </span>
               </label>
             </div>
-            <label className="switch">
-              <input type="checkbox" checked={!closed.has(link.id)} onChange={() => toggleClosed(link.id)} />
-              <span>
-                <b>Road</b> {closed.has(link.id) ? "closed" : "open"}
-              </span>
-            </label>
-            <p className="hint">Narrow lanes are driven more slowly with longer headways (factor 0.7 at 2.5 m to 1.0 at 3.5 m).</p>
           </div>
         )}
         {(editedLinks.length > 0 || s.closedLinks.length > 0) && (
