@@ -4,14 +4,14 @@ Audited 15 Nov 2026, from 00:04 IST, commit `2502056` (HEAD of `main`), by a Cla
 Branch: `release-readiness/2026-11-15` (new tests and manifests only; **no application source was changed**).
 
 **Target:** one Docker image on Render's free tier (`render.yaml`, auto-deploy on push to `main`).
-**Criticality:** public demo for a job application. No accounts, money or personal data; the server stores scenario JSON and run results.
-**Constraints:** no production contact (all tests ran on local builds and containers), about a 1-hour budget, deadline 15 Nov.
+**Criticality:** public demo. No accounts, money or personal data; the server stores scenario JSON and run results.
+**Constraints:** no production contact (all tests ran on local builds and containers), about a 1-hour budget.
 
 ## 1. Verdict: GO-WITH-CONDITIONS
 
 - No blocker under the stated rules: the clean-room build, type checks and all 99 existing tests (87 engine, 12 server) pass; `npm audit` reports 0 vulnerabilities; no secrets in the tree or in 15 commits of history; no reachable exploit found; a deploy → rollback rehearsal over one database kept data readable in both directions.
 - One **High** and seven **Medium** findings remain. The High (F-3) lets a single unauthenticated client crash the server by filling its disk; on Render the crash is self-healing (restart, ephemeral disk), so the impact is downtime, not data loss.
-- Conditions before relying on it for real traffic: fix F-3, F-1 and F-4 (each a few lines); the rest are recommended. Whether to fix them before the application deadline is the owner's call.
+- Conditions before relying on it for real traffic: fix F-3, F-1 and F-4 (each a few lines); the rest are recommended. Whether to fix them before release is the owner's call.
 
 ## 1b. Update: fixes applied (branch `fix/audit-findings`)
 

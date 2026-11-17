@@ -12,3 +12,9 @@ coverage/
 *.db-shm
 *.db-wal
 .superdesign/
+
+# Local-only files (kept on disk, not in the repo)
+/ASSIGNMENT.md
+/VIDEO_SCRIPT.md
+/VIDEO_SCRIPT_CODE.md
+/Claude Session - IISc. Bangalore

@@ -254,7 +254,7 @@ None crashed; each failure mode is reported in the results rather than hidden.
 
 **Finding:** under heavy overload the worst single braking event exceeds the 9.8 m/s² seen at
 normal demand (12.7 m/s² at 3× demand over two hours). Where it happens has not been
-investigated; it is listed under known limitations and was not chased this close to the deadline.
+investigated; it is listed under known limitations and was not chased further.
 
 ## Known limitations
 

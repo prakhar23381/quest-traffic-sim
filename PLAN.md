@@ -1,27 +1,20 @@
-# PLAN — Agent-Based Traffic Simulation (QUEST Lab, Project 2)
+# PLAN — Agent-Based Traffic Simulation
 
-Applicant: Prakhar Saxena · Session started: 13 November 2026
-
-> **Date correction for the log:** the first prompt of this session says "13 November **2027**".
-> That is a typo; the correct date is **13 November 2026**. It is noted here and in the README so the
-> session log and the repo agree.
+Author: Prakhar Saxena · Started: 13 November 2026
 
 ---
 
-## 0. Brief, constraints and what "done" means
+## 0. Goal, constraints and what "done" means
 
-**Brief (from ASSIGNMENT.md):** build and run an agent-based model of traffic on a road network with
+**Goal:** build and run an agent-based model of traffic on a road network with
 **junctions, flyovers, and roads of different widths and capacities**. Deploy it as an application
 where users **set up scenarios and see results**.
 
-**Hard rules**
-| Rule | How this plan handles it |
+**Working practices**
+| Practice | How this plan handles it |
 |---|---|
-| One single Claude Code session; nothing built outside it | All code, data processing, tests, deploys and git commands run from this session. No other editors or terminals are used to write code. |
-| 72 h max, first prompt → final commit | Starts 13 Nov 2026. The **application deadline of 15 Nov 2026 comes first**, so the real budget is **about 48 h**. Code freeze is the morning of 15 Nov. |
-| First-prompt line | Done (date typo noted above). |
-| Commit from inside the session | Commit at the end of every phase and at each meaningful sub-step, with descriptive messages. |
-| Submit: raw `.jsonl` log, public repo, live app, short video | See the Phase 8 checklist. |
+| Commit often | Commit at the end of every phase and at each meaningful sub-step, with descriptive messages. |
+| Deliverables | Public repo, live app, short video. See the Phase 8 checklist. |
 
 **Machine:** Apple M1, 16 GB RAM, **only about 20 GB of disk free**, Node 22, Python 3.12, Docker. `gh` 2.103 is
 installed at `~/.local/bin/gh` (not on the default PATH, so call it by full path) and is logged in.
@@ -35,7 +28,7 @@ installed at `~/.local/bin/gh` (not on the default PATH, so call it by full path
    and the fundamental diagram and junction capacity match theory. This is backed by automated tests and a
    short validation report in the repo.
 3. A README with architecture, modelling assumptions, known limitations, a live link, and how to run it locally.
-4. A video walkthrough and the session log.
+4. A video walkthrough.
 
 ---
 
@@ -177,11 +170,10 @@ and an **exit check** that must pass before moving on.
 - README: what it is, a screenshot or GIF, live link, architecture, how to run, test commands, limitations, next steps.
 - **Exit:** clean `npm test` and build. The live app is redeployed. Commit.
 
-### Phase 8 — Submission (44 → 48 h, before the 15 Nov deadline)
+### Phase 8 — Release (44 → 48 h)
 - Final commit and push, then confirm the public repo shows the full history.
-- Record a **3–5 minute video walkthrough**: the problem, a live demo (Bengaluru flyover on/off compare, a signal-timing change, the Braess demo), the validation evidence, and the architecture. Recording the video is not development, so it can happen outside the session.
-- Find the session log: `~/.claude/projects/-Users-PrakharSaxena-Documents-Code-IISc-Bangalore/<session-id>.jsonl`. Submit it **raw and unedited**.
-- **Checklist:** ☐ `.jsonl` log ☐ public repo URL ☐ live app URL ☐ video URL ☐ form submitted before the deadline.
+- Record a **3–5 minute video walkthrough**: the problem, a live demo (Bengaluru flyover on/off compare, a signal-timing change, the Braess demo), the validation evidence, and the architecture.
+- **Checklist:** ☐ public repo URL ☐ live app URL ☐ video URL.
 
 ---
 
@@ -222,7 +214,6 @@ compare mode, deployed and validated.
 | Junction logic takes longer than planned | Delays Phases 3–5 | Get the conflict-set rule working on synthetic junctions first; Bengaluru only after that. Time-box: if it isn't done by 17 h, simplify the junction model. |
 | OSM data is messy (missing lanes, odd geometry) | Gridlock or visual bugs | Keep the bbox small, impute by highway class, keep a hand-fix overrides file, and keep the synthetic presets as the reliable fallback. |
 | Free hosting cold starts or memory limits | Slow or broken demo | The simulation runs client-side, so the server stays light. Smoke test after every deploy. |
-| Deadline (15 Nov) | Hard stop | Code freeze on the morning of 15 Nov. Phases 7–8 hold the buffer. |
 | Low disk (20 GB free) | Docker builds fail | Prune Docker images and caches; the OSM data is tiny. |
 | Context compaction in a long session | Lost context | This PLAN.md plus frequent commits are the source of truth. Update the status section below after each phase. |
 
@@ -245,4 +236,4 @@ compare mode, deployed and validated.
 | 5 Frontend | ☐ | | |
 | 6 Deploy | ☐ | | |
 | 7 Hardening | ☐ | | |
-| 8 Submission | ☐ | | |
+| 8 Release | ☐ | | |
